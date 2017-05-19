@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build:webpack": "NODE_ENV=production webpack --config webpack.config.prod.js",
-    "build": "npm run clean && npm run build:webpack",
+    "build": "npm run clean && npm run build:webpack && cp index.html dist",
     "lint": "eslint src",
     "test": "mocha --compilers js:babel-register --recursive",
     "test:watch": "npm test -- --watch"
@@ -30,7 +30,7 @@
     "eslint": "^1.10.3",
     "eslint-plugin-react": "^3.16.1",
     "expect": "^1.18.0",
-    "mocha": "^2.4.5",
+    "mocha": "^3.4.1",
     "react-addons-test-utils": "^0.14.8",
     "rimraf": "^2.4.3",
     "webpack": "^1.9.6"

@@ -4,7 +4,7 @@
 Nice recipe card interface for Peachworks recipe data.
 
 ```
-npm build
+npm run build
 ```
 
 As a starting point.

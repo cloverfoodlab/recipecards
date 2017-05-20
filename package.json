@@ -12,11 +12,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/wangfowen/recipecards.git"
+    "url": "https://github.com/cloverfoodlab/recipecards.git"
   },
-  "author": "Owen Wang",
+  "author": "Clover Food Lab",
   "bugs": {
-    "url": "https://github.com/wangfowen/recipecards/issues"
+    "url": "https://github.com/cloverfoodlab/recipecards/issues"
   },
   "license": "CC0-1.0",
   "devDependencies": {

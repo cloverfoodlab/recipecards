@@ -3,8 +3,11 @@ cp index.html dist
 
 echo "creating api redirect"
 rm _redirects
-echo '/api/*  https://api.whentomanage.com/v1/accounts/2985/:splat?access_token='$PEACHWORKS_ACCESS_TOKEN' 200' >> _redirects
-echo '/test/* owenwang.com/:splat 200' >> _redirects
+echo '/api/*  https://api.peachworks.com/v1/accounts/'$PEACHWORKS_ACCOUNT_ID'/:splat?access_token='$PEACHWORKS_ACCESS_TOKEN' 200' >> _redirects
+echo '/test/* http://owenwang.com/:splat 200' >> _redirects
 echo '/foo /' >> _redirects
+
+echo "copying redirects and headers into dist"
 cp _redirects dist
+cp _headers dist
 

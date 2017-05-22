@@ -1,9 +1,18 @@
 import 'babel-polyfill'
 import React from 'react'
 import { render } from 'react-dom'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+
+import recipes from './reducers'
+import RecipesContainer from './containers/RecipesContainer'
+
+let store = createStore(recipes)
 
 render(
-  <h1>Recipe Cards</h1>,
+  <Provider store= { store }>
+    <RecipesContainer />
+  </Provider>,
   document.getElementById('root')
 );
 

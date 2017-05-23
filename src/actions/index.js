@@ -8,3 +8,14 @@ export const loadRecipes = () => {
     }
   }
 }
+
+export const loadRecipe = (id) => {
+  return {
+    type: 'LOAD_RECIPE',
+    payload: {
+      request: {
+        url: '/wtm_recipes/' + id
+      }
+    }
+  }
+}

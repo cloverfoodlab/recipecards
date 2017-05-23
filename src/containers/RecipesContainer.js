@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 
-import Recipes from '../components/Recipes'
+import RecipeList from '../components/RecipeList'
 import { loadRecipes } from '../actions'
 
 const mapStateToProps = (state) => {
@@ -18,6 +18,6 @@ const mapDispatchToProps = (dispatch) => {
 const RecipesContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(Recipes)
+)(RecipeList)
 
 export default RecipesContainer

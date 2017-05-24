@@ -10,10 +10,10 @@ const recipes = (state = defaultState, action) => {
 
       return state
     case 'LOAD_RECIPES_SUCCESS':
-      console.log(payload)
+      console.log("loading recipes success")
 
       return [...state,
-        //TODO: include payload.???, currently a hack to display new fake data
+        //TODO: include payload, currently a hack to display new fake data
         { name: "recipe 3", id: 3 }
       ]
     case 'LOAD_RECIPES_FAIL':
@@ -35,13 +35,10 @@ const recipe = (state, action) => {
 
       return state
     case 'LOAD_RECIPE_SUCCESS':
-      console.log(payload)
+      console.log("loading recipe success")
 
-      return {
-        //TODO: could've sworn spread operator worked in object also...
-        //TODO: include payload.???, currently a hack to display new fake data
-        name: state.name,
-        id: state.id,
+      return {...state,
+        //TODO: include payload, currently a hack to display new fake data
         recipe: {
           name: state.name,
           yield: 1
@@ -51,9 +48,7 @@ const recipe = (state, action) => {
       //TODO: log failure, currently a hack to display new fake data
       console.log("loading recipe failed")
 
-      return {
-        name: state.name,
-        id: state.id,
+      return {...state,
         recipe: {
           name: state.name,
           yield: 1

@@ -1,7 +1,8 @@
 import 'babel-polyfill'
 import React, { PropTypes } from 'react'
+import { connect } from 'react-redux'
 
-const Recipe = ({name, yieldAmount, description, ingredients, instructions}) => {
+const Recipe = ({id, name, yieldAmount, description, ingredients, instructions}) => {
   return (
     <div className="recipe">
       <div>Name: { name }</div>
@@ -20,6 +21,7 @@ const Recipe = ({name, yieldAmount, description, ingredients, instructions}) => 
 }
 
 Recipe.propTypes = {
+  id: PropTypes.number,
   name: PropTypes.string,
   yield: PropTypes.number,
   description: PropTypes.string,
@@ -28,4 +30,14 @@ Recipe.propTypes = {
   //TODO: subrecipes how organize
 }
 
-export default Recipe
+const mapStateToProps = (state, ownProps) => {
+  return {
+    //TODO: how load just this one id's recipe state from url..?
+    recipes: state
+  }
+}
+
+export default connect(
+  mapStateToProps
+)(Recipe)
+

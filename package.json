@@ -12,6 +12,13 @@
     "test": "mocha --compilers js:babel-register --recursive",
     "test:watch": "npm test -- --watch"
   },
+  "now": {
+    "alias": "recipes",
+    "env": {
+      "PEACHWORKS_ACCOUNT_ID": "@peachworks-account-id",
+      "PEACHWORKS_ACCESS_TOKEN": "@peachworks-access-token"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/cloverfoodlab/recipecards.git"

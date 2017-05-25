@@ -17,7 +17,6 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
-        'PEACHWORKS_ACCESS_TOKEN': JSON.stringify(process.env.PEACHWORKS_ACCESS_TOKEN)
       }
     })
   ],

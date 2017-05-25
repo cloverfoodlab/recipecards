@@ -7,9 +7,10 @@ import { loadRecipe } from '../actions'
 const RecipeLink = ({ id, name, onClick }) => {
   return (
     <Link
-      to={ "/" + id }
+      to={ "/recipe/" + id }
       style={{
-        textDecoration: 'none'
+        textDecoration: 'none',
+        color: "black"
       }}
     >
       <div onClick = {() => onClick(id)}>{ name }</div>

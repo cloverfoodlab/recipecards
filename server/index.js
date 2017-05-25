@@ -57,5 +57,24 @@ app.get('/api/wtm_recipes', function (req, res) {
         });
 });
 
+const webpack = require('webpack');
+const config = require('../webpack.config.dev');
+const compiler = webpack(config);
+
+if (process.env.NODE_ENV !== "production") {
+  app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: true,
+    publicPath: config.output.publicPath
+  }));
+
+  app.use(require('webpack-hot-middleware')(compiler));
+}
+
 app.use(express.static('dist'));
-app.listen(3000);
+app.listen(3000, function(err) {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  console.log("Listening at port 3000");
+});

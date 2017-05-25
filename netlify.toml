@@ -1,5 +1,0 @@
-# Global settings applied to the whole site.
-[build]
-  base    = ""
-  publish = "dist"
-  command = "npm run build"

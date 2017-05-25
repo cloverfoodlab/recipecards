@@ -16,7 +16,8 @@
     "alias": "recipes",
     "env": {
       "PEACHWORKS_ACCOUNT_ID": "@peachworks-account-id",
-      "PEACHWORKS_ACCESS_TOKEN": "@peachworks-access-token"
+      "PEACHWORKS_ACCESS_TOKEN": "@peachworks-access-token",
+      "NODE_ENV": "production"
     }
   },
   "repository": {

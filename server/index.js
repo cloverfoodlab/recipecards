@@ -5,9 +5,9 @@ const fetch = require('node-fetch');
 const queryString = require('query-string');
 
 // for every URL path that starts with /api/, send request to upstream API service
-var peachworksAPIURL = function(query_obj) {
-    var peachworks_account_id = process.env.PEACHWORKS_ACCOUNT_ID;
-    var peachworks_access_token = process.env.PEACHWORKS_ACCESS_TOKEN;
+function peachworksAPIURL(query_obj) {
+    let peachworks_account_id = process.env.PEACHWORKS_ACCOUNT_ID;
+    let peachworks_access_token = process.env.PEACHWORKS_ACCESS_TOKEN;
 
     let result_query = Object.assign({}, query_obj, {
         access_token: peachworks_access_token
@@ -21,6 +21,17 @@ var peachworksAPIURL = function(query_obj) {
     );
 };
 
+function getPage(peach_json) {
+    var page = 1;
+    if (peach_json.params) {
+        let pageString = peach_json.params['page'] || "1";
+        page = parseInt(pageString, 10);
+        if (isNaN(page)) {
+            page = 1;
+        }
+    }
+    return page;
+}
 
 app.get('/api/wtm_recipes', function (req, res) {
     let api_url = peachworksAPIURL(req.query);
@@ -33,7 +44,17 @@ app.get('/api/wtm_recipes', function (req, res) {
     // so we can have client-side pagination logic.
     fetch(api_url)
         .then(api_res => api_res.json())
-        .then(json => res.json(json.results));
+        .then(json => {
+            if (json.error) {
+                res.json(json);
+            } else {
+                res.json({
+                    results: json.results,
+                    count: json.count,
+                    page: getPage(json)
+                });
+            }
+        });
 });
 
 app.use(express.static('dist'));

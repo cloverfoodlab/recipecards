@@ -4,6 +4,7 @@ var webpack = require('webpack');
 module.exports = {
   devtool: 'eval',
   entry: [
+    'webpack-hot-middleware/client',
     './src/index'
   ],
   output: {
@@ -12,10 +13,10 @@ module.exports = {
     publicPath: '/dist/'
   },
   plugins: [
+    new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
-        'PEACHWORKS_ACCESS_TOKEN': JSON.stringify(process.env.PEACHWORKS_ACCESS_TOKEN)
       }
     })
   ],

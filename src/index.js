@@ -4,10 +4,12 @@ import axiosMiddleware from 'redux-axios-middleware'
 import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { createStore, applyMiddleware } from 'redux'
 
 import recipes from './reducers'
-import RecipesContainer from './containers/RecipesContainer'
+import Recipe from './containers/Recipe'
+import RecipesList from './containers/RecipesList'
 
 const client = axios.create({
   baseURL:'api',
@@ -22,7 +24,12 @@ let store = createStore(
 
 render(
   <Provider store= { store }>
-    <RecipesContainer />
+    <Router>
+      <div>
+        <Route exact path="/" component={ RecipesList }/>
+        <Route path="/recipe/:id" component={ Recipe }/>
+      </div>
+    </Router>
   </Provider>,
   document.getElementById('root')
 )

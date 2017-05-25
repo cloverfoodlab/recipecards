@@ -4,3 +4,4 @@ npm-debug.log
 dist
 _redirects
 .DS_Store
+.idea

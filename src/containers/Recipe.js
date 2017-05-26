@@ -2,7 +2,9 @@ import 'babel-polyfill'
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-const Recipe = ({id, name, yieldAmount, description, ingredients, instructions}) => {
+const Recipe = ({recipe}) => {
+  const {id, name, yieldAmount, description, ingredients, instructions} = recipe
+
   return (
     <div className="recipe">
       <div>Name: { name }</div>
@@ -23,7 +25,7 @@ const Recipe = ({id, name, yieldAmount, description, ingredients, instructions})
 Recipe.propTypes = {
   id: PropTypes.number,
   name: PropTypes.string,
-  yield: PropTypes.number,
+  yieldAmount: PropTypes.number,
   description: PropTypes.string,
   ingredients: PropTypes.array,
   instructions: PropTypes.array
@@ -31,9 +33,9 @@ Recipe.propTypes = {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  const urlId = parseInt(ownProps.match.params[0], 10)
   return {
-    //TODO: how load just this one id's recipe state from url..?
-    recipes: state
+    recipe: state.recipes.find(recipe => recipe.id === urlId)
   }
 }
 

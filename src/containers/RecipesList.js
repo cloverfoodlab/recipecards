@@ -21,7 +21,7 @@ RecipesList.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    recipes: state
+    recipes: state.recipeList
   }
 }
 

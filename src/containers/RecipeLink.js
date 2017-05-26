@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { loadRecipe } from '../actions'
 
 const RecipeLink = ({ id, name, onClick }) => {
+  //TODO: link currently overrides onClick
   return (
     <Link
       to={ "/recipe/" + id }

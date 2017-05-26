@@ -9,9 +9,9 @@ app.get('/api/wtm_recipes', function (req, res) {
 const webpack = require('webpack');
 const path = require('path');
 
-app.use('/dist', express.static('dist'));
-
 if (process.env.NODE_ENV !== "production") {
+  app.use('/dist', express.static('static'));
+
   const config = require('../webpack.config.dev');
 
   const compiler = webpack(config);
@@ -24,6 +24,8 @@ if (process.env.NODE_ENV !== "production") {
 
   const webpackHotMiddleware = require('webpack-hot-middleware');
   app.use(webpackHotMiddleware(compiler));
+} else {
+  app.use('/dist', express.static('dist'));
 }
 
 // default fallthrough path so SPA routes direct to index page
@@ -31,7 +33,6 @@ if (process.env.NODE_ENV !== "production") {
 // but this is fine for now.
 app.get('*', function(req, res) {
     let index_path = path.resolve(__dirname, '../index.html');
-    console.log(index_path);
     res.sendFile(index_path);
 });
 

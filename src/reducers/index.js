@@ -1,7 +1,4 @@
-const defaultState = [
-  { name: "recipe 1", id: 1 },
-  { name: "recipe 2", id: 2 }
-]
+const defaultState = []
 
 const recipes = (state = defaultState, action) => {
   switch (action.type) {
@@ -10,19 +7,16 @@ const recipes = (state = defaultState, action) => {
 
       return state
     case 'LOAD_RECIPES_SUCCESS':
-      console.log("loading recipes success")
+      //TODO: process pages beyond the first one
+      const recipesJson = action.payload.data.results
+      const newRecipes = recipesJson.map(recipe => {
+        return { name: recipe.name, id: recipe.id }
+      })
 
-      return [...state,
-        //TODO: include payload, currently a hack to display new fake data
-        { name: "recipe 3", id: 3 }
-      ]
+      return state.concat(newRecipes)
     case 'LOAD_RECIPES_FAIL':
-      //TODO: log failure, currently a hack to display new fake data
-      console.log("loading recipes failed")
-
-      return [...state,
-        { name: "recipe 3", id: 3 }
-      ]
+      console.log("error loading recipes: " + action.error)
+      return state
     default:
       return state.map(r => recipe(r, action))
   }
@@ -45,15 +39,8 @@ const recipe = (state, action) => {
         }
       }
     case 'LOAD_RECIPE_FAIL':
-      //TODO: log failure, currently a hack to display new fake data
-      console.log("loading recipe failed")
-
-      return {...state,
-        recipe: {
-          name: state.name,
-          yield: 1
-        }
-      }
+      console.log("error loading recipe: " + action.error)
+      return state
     default:
       return state
   }

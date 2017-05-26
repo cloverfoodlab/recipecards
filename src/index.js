@@ -12,7 +12,7 @@ import Recipe from './containers/Recipe'
 import RecipesList from './containers/RecipesList'
 
 const client = axios.create({
-  baseURL:'api',
+  baseURL:'/api',
   responseType: 'json'
 });
 let store = createStore(

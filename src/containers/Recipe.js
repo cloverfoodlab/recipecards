@@ -1,25 +1,34 @@
 import 'babel-polyfill'
-import React, { PropTypes } from 'react'
+import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-const Recipe = ({recipe}) => {
-  const {id, name, yieldAmount, description, ingredients, instructions} = recipe
+import { loadRecipe } from '../actions'
 
-  return (
-    <div className="recipe">
-      <div>Name: { name }</div>
-      <div>Yield: { yieldAmount }</div>
-      <div>{ description }</div>
-      <div className="ingredients">
-        <div>Ingredients</div>
-        { ingredients && ingredients.map(ingredient => <Ingredient { ...ingredient } />) }
+class Recipe extends Component {
+  constructor(props) {
+    super()
+    props.onLoad(props.recipe.id)
+  }
+
+  render() {
+    const {id, name, yieldAmount, description, ingredients, instructions} = this.props.recipe
+
+    return (
+      <div className="recipe" onLoad={ () => onLoad(id) }>
+        <div>Name: { name }</div>
+        <div>Yield: { yieldAmount }</div>
+        <div>{ description }</div>
+        <div className="ingredients">
+          <div>Ingredients</div>
+          { ingredients && ingredients.map(ingredient => <Ingredient { ...ingredient } />) }
+        </div>
+        <div className="instructions">
+          <div>Method of Prep</div>
+          { instructions && instructions.map(instruction => <Instruction { ...instruction } />) }
+        </div>
       </div>
-      <div className="instructions">
-        <div>Method of Prep</div>
-        { instructions && instructions.map(instruction => <Instruction { ...instruction } />) }
-      </div>
-    </div>
-  )
+    )
+  }
 }
 
 Recipe.propTypes = {
@@ -28,18 +37,28 @@ Recipe.propTypes = {
   yieldAmount: PropTypes.number,
   description: PropTypes.string,
   ingredients: PropTypes.array,
-  instructions: PropTypes.array
+  instructions: PropTypes.array,
+  onLoad: PropTypes.func
   //TODO: subrecipes how organize
 }
 
 const mapStateToProps = (state, ownProps) => {
   const urlId = parseInt(ownProps.match.params[0], 10)
   return {
-    recipe: state.recipes.find(recipe => recipe.id === urlId)
+    recipe: state.recipes.find(recipe => recipe.id === urlId) || { id: urlId }
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onLoad: (id) => {
+      dispatch(loadRecipe(id))
+    }
   }
 }
 
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(Recipe)
 

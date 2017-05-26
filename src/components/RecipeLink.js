@@ -2,9 +2,7 @@ import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { loadRecipe } from '../actions'
-
-const RecipeLink = ({ id, name, onClick }) => {
+const RecipeLink = ({ id, name }) => {
   //TODO: link currently overrides onClick
   return (
     <Link
@@ -14,7 +12,7 @@ const RecipeLink = ({ id, name, onClick }) => {
         color: "black"
       }}
     >
-      <div onClick = {() => onClick(id)}>{ name }</div>
+      <div>{ name }</div>
     </Link>
   )
 }
@@ -25,19 +23,4 @@ RecipeLink.propTypes = {
   onClick: PropTypes.func
 }
 
-const mapStateToProps = (state) => {
-  return { }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    onClick: (id) => {
-      dispatch(loadRecipe(id))
-    }
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RecipeLink)
+export default RecipeLink

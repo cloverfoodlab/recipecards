@@ -3,7 +3,11 @@ const app = express();
 const peachworks = require('./peachworks');
 
 app.get('/api/wtm_recipes', function (req, res) {
-    peachworks.proxyGetRecipes(req, res);
+  peachworks.proxyGetRecipes(req, res);
+});
+
+app.get('/api/wtm_recipes/:id', function (req, res) {
+  peachworks.proxyGetRecipe(req, res);
 });
 
 const webpack = require('webpack');
@@ -28,12 +32,14 @@ if (process.env.NODE_ENV !== "production") {
   app.use('/dist', express.static('dist'));
 }
 
-// default fallthrough path so SPA routes direct to index page
-// maybe we should be more explicit about the routes eventually?
-// but this is fine for now.
-app.get('*', function(req, res) {
-    let index_path = path.resolve(__dirname, '../index.html');
-    res.sendFile(index_path);
+app.get('/', function(req, res) {
+  let index_path = path.resolve(__dirname, '../index.html');
+  res.sendFile(index_path);
+});
+
+app.get('/recipe/:id', function(req, res) {
+  let index_path = path.resolve(__dirname, '../index.html');
+  res.sendFile(index_path);
 });
 
 app.listen(3000, function(err) {
@@ -41,5 +47,6 @@ app.listen(3000, function(err) {
     console.log(err);
     return;
   }
+
   console.log("Listening at port 3000");
 });

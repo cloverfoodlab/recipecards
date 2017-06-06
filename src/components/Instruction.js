@@ -11,4 +11,4 @@ Instruction.propTypes = {
   content: PropTypes.string
 }
 
-export default Ingredient
+export default Instruction

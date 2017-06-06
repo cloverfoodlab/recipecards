@@ -2,12 +2,16 @@ const express = require('express');
 const app = express();
 const peachworks = require('./peachworks');
 
-app.get('/api/wtm_recipes', function (req, res) {
+app.get('/api/recipes', function (req, res) {
   peachworks.proxyGetRecipes(req, res);
 });
 
-app.get('/api/wtm_recipes/:id', function (req, res) {
-  peachworks.proxyGetRecipe(req, res);
+app.get('/api/inventory/:id', function (req, res) {
+  peachworks.proxyGetInventory(req, res);
+});
+
+app.get('/api/instructions/:id', function (req, res) {
+  peachworks.proxyGetInstructions(req, res);
 });
 
 const webpack = require('webpack');

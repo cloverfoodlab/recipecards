@@ -3,6 +3,8 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
 import { loadRecipe } from '../actions'
+import Ingredient from '../components/Ingredient'
+import Instruction from '../components/Instruction'
 
 class Recipe extends Component {
   constructor(props) {

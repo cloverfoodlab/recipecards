@@ -8,9 +8,9 @@ const Ingredient = ({quantity, unit, name}) => {
 }
 
 Ingredient.propTypes = {
-  quantity: PropType.number,
-  unit: PropType.string,
-  name: PropType.string
+  quantity: PropTypes.number,
+  unit: PropTypes.string,
+  name: PropTypes.string
 }
 
 export default Ingredient

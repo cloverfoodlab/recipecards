@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 const RecipeLink = ({ id, name }) => {
-  //TODO: link currently overrides onClick
   return (
     <Link
       to={ "/recipe/" + id }
@@ -19,8 +18,7 @@ const RecipeLink = ({ id, name }) => {
 
 RecipeLink.propTypes = {
   id: PropTypes.number,
-  name: PropTypes.string,
-  onClick: PropTypes.func
+  name: PropTypes.string
 }
 
 export default RecipeLink

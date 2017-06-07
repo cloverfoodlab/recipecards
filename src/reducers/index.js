@@ -1,59 +1,91 @@
-const defaultState = [
-  { name: "recipe 1", id: 1 },
-  { name: "recipe 2", id: 2 }
-]
+const defaultState = {
+  recipeList: [],
+  recipes: []
+}
 
 const recipes = (state = defaultState, action) => {
   switch (action.type) {
     case 'LOAD_RECIPES':
       console.log("loading recipes")
-
       return state
+
     case 'LOAD_RECIPES_SUCCESS':
-      console.log("loading recipes success")
+      //TODO: process pages beyond the first one
+      const recipesJson = action.payload.data.json.results
+      const recipeList = recipesJson.map(recipe => {
+        return { name: recipe.name, id: recipe.id }
+      })
+      return {...state, recipeList: recipeList}
 
-      return [...state,
-        //TODO: include payload, currently a hack to display new fake data
-        { name: "recipe 3", id: 3 }
-      ]
     case 'LOAD_RECIPES_FAIL':
-      //TODO: log failure, currently a hack to display new fake data
-      console.log("loading recipes failed")
+      console.log("error loading recipes: " + action.error)
+      return state
 
-      return [...state,
-        { name: "recipe 3", id: 3 }
-      ]
+    //using load inventory as signal that we're loading recipe
+    case 'LOAD_INVENTORY':
+      if (state.recipes.find(recipe => recipe.id === action.id)) {
+        return state
+      } else {
+        return {...state,
+          recipes: [...state.recipes,
+            {
+              id: action.id
+            }
+          ]
+        }
+      }
+
     default:
-      return state.map(r => recipe(r, action))
+      return {...state,
+  /*
+   * TODO: is there a nice way to map the key-value pairs for an object or something like that?
+   * basically a clean way to pass to recipe function here,
+   * while also making LOAD_INVENTORY and the mapStateToProps in containers/Recipe.js cleaner
+   */
+        recipes: state.recipes.map(r => recipe(r, action))
+      }
   }
 }
 
 const recipe = (state, action) => {
   switch (action.type) {
-    case 'LOAD_RECIPE':
-      console.log("loading recipe")
+    case 'LOAD_INVENTORY_SUCCESS':
+      console.log(action.payload);
+      const ingredientsJson = action.payload.data.json.results;
+      const ingredientsData = ingredientsJson.map(i => {
+        return {
+          quantity: i.common_quantity,
+          unit: i.common_unit_id //TODO: convert to human readable,
+          //name: TODO
+        }
+      });
 
+      return {...state,
+        ingredients: ingredientsData
+      }
+
+    case 'LOAD_INVENTORY_FAIL':
+      console.log("error loading inventory: " + action.error)
       return state
-    case 'LOAD_RECIPE_SUCCESS':
-      console.log("loading recipe success")
+
+    case 'LOAD_INSTRUCTIONS_SUCCESS':
+      console.log(action.payload)
+      const instructionsJson = action.payload.data.json.results
+      const instructionsData = instructionsJson.map(i => {
+        return {
+          //TODO: this is hilariously in terrible html
+          content: i.content
+        }
+      })
 
       return {...state,
-        //TODO: include payload, currently a hack to display new fake data
-        recipe: {
-          name: state.name,
-          yield: 1
-        }
+        instructions: instructionsData
       }
-    case 'LOAD_RECIPE_FAIL':
-      //TODO: log failure, currently a hack to display new fake data
-      console.log("loading recipe failed")
 
-      return {...state,
-        recipe: {
-          name: state.name,
-          yield: 1
-        }
-      }
+    case 'LOAD_INSTRUCTIONS_FAIL':
+      console.log("error loading instructions: " + action.error)
+      return state
+
     default:
       return state
   }

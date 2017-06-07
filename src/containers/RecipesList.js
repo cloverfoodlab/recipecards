@@ -1,17 +1,25 @@
-import React, { PropTypes } from 'react'
+import 'babel-polyfill'
+import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
 import { loadRecipes } from '../actions'
-import RecipeLink from './RecipeLink'
+import RecipeLink from '../components/RecipeLink'
 
-const RecipesList = ({ recipes, onLoad }) => {
-  return (
-    <div className="recipes">
-      <h1>Recipes</h1>
-      <button onClick={onLoad}>Load Recipes</button>
-      { recipes.map(recipe => <RecipeLink { ...recipe } />) }
-    </div>
-  )
+class RecipesList extends Component {
+  constructor(props) {
+    super()
+    props.onLoad()
+  }
+
+  render() {
+    const { recipes } = this.props
+    return (
+      <div className="recipes">
+        <h1>Recipes</h1>
+        { recipes.map(recipe => <RecipeLink { ...recipe } />) }
+      </div>
+    )
+  }
 }
 
 RecipesList.propTypes = {
@@ -21,7 +29,7 @@ RecipesList.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    recipes: state
+    recipes: state.recipeList
   }
 }
 

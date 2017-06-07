@@ -5,6 +5,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
+import thunk from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux'
 
 import recipes from './reducers'
@@ -12,13 +13,14 @@ import Recipe from './containers/Recipe'
 import RecipesList from './containers/RecipesList'
 
 const client = axios.create({
-  baseURL:'api',
+  baseURL:'/api',
   responseType: 'json'
 });
 let store = createStore(
   recipes,
   applyMiddleware(
-    axiosMiddleware(client)
+    axiosMiddleware(client),
+    thunk
   )
 )
 
@@ -27,7 +29,7 @@ render(
     <Router>
       <div>
         <Route exact path="/" component={ RecipesList }/>
-        <Route path="/recipe/:id" component={ Recipe }/>
+        <Route path="/recipe/(\d+)" component={ Recipe }/>
       </div>
     </Router>
   </Provider>,

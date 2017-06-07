@@ -24,21 +24,30 @@ const peachworksApiUrl = (queryObj, url, otherQueries = {}) => {
   );
 }
 
+const stripAccessToken = (peachJson) => {
+  // this feels really nasty coming from immutable object land...
+  // there is probably a more idiomatic way to do this
+  const peachJsonCopy = Object.assign({}, peachJson)
+  if (peachJsonCopy.hasOwnProperty('params') && peachJsonCopy.params.hasOwnProperty('access_token')) {
+    delete peachJsonCopy.params.access_token
+  }
+  return peachJsonCopy
+}
+
 const fetchAndRespond = (apiUrl, res) => {
-  // proof of concept, need to handle failed (non-json)
-  // responses. want to strip out params
-  // since that leaks the access_token,
-  // but still want to show total item count
-  // so we can have client-side pagination logic.
+  // proof of concept, may need to handle failed (non-json) responses.
+  // access_token is stripped out of the params property if present to avoid leaking to client.
+  // we also introduce an explicit page property for simpler client-side pagination logic.
   fetch(apiUrl)
     .then(apiRes => apiRes.json())
     .then(json => {
       if (json.error) {
         res.json(json);
       } else {
+        const cleanedJson = stripAccessToken(json)
         res.json({
-          json: json,
-          page: getPage(json)
+          json: cleanedJson,
+          page: getPage(cleanedJson)
         });
       }
     });

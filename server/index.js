@@ -1,17 +1,14 @@
 const express = require('express');
 const app = express();
 const peachworks = require('./peachworks');
+const db = require('./db');
 
 app.get('/api/recipes', function (req, res) {
-  peachworks.proxyGetRecipes(req, res);
+  db.getRecipes(req, res);
 });
 
-app.get('/api/inventory/:id', function (req, res) {
-  peachworks.proxyGetInventory(req, res);
-});
-
-app.get('/api/instructions/:id', function (req, res) {
-  peachworks.proxyGetInstructions(req, res);
+app.get('/api/recipe/:id', function (req, res) {
+  db.getRecipe(req, res);
 });
 
 const webpack = require('webpack');

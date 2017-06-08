@@ -13,7 +13,7 @@ class Recipe extends Component {
   }
 
   render() {
-    const {id, name, yieldAmount, description, ingredients, instructions} = this.props.recipe
+    const {id, name, yieldAmount, description, inventory, instructions} = this.props.recipe
 
     return (
       <div className="recipe" onLoad={ () => onLoad(id) }>
@@ -22,11 +22,11 @@ class Recipe extends Component {
         <div>{ description }</div>
         <div className="ingredients">
           <div>Ingredients</div>
-          { ingredients && ingredients.map(ingredient => <Ingredient { ...ingredient } />) }
+          { inventory && inventory.map(i => <Ingredient { ...i } />) }
         </div>
         <div className="instructions">
           <div>Method of Prep</div>
-          { instructions && instructions.map(instruction => <Instruction { ...instruction } />) }
+          { instructions && instructions.map(i => <Instruction { ...i } />) }
         </div>
       </div>
     )

@@ -55,6 +55,8 @@
     "express": "^4.15.3",
     "node-fetch": "^1.7.0",
     "node-sass": "^3.4.2",
+    "pouchdb": "^6.2.0",
+    "pouchdb-adapter-memory": "^6.2.0",
     "query-string": "^4.3.4",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
@@ -63,6 +65,7 @@
     "redux": "^3.3.1",
     "redux-axios-middleware": "^4.0.0",
     "redux-thunk": "^2.2.0",
+    "relational-pouch": "^1.4.5",
     "sass-loader": "^3.1.2",
     "webpack": "^1.12.11"
   }

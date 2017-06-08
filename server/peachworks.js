@@ -2,19 +2,13 @@ const fetch = require('node-fetch');
 const queryString = require('query-string');
 
 // for every URL path that starts with /api/, send request to upstream API service
-const peachworksApiUrl = (queryObj, url, otherQueries = {}) => {
+const peachworksApiUrl = (url, otherQueries = {}) => {
   const peachworksAccountId = process.env.PEACHWORKS_ACCOUNT_ID;
   const peachworksAccessToken = process.env.PEACHWORKS_ACCESS_TOKEN;
 
-  let resultQuery = Object.assign({}, queryObj, {
+  let resultQuery = Object.assign({}, otherQueries, {
     "access_token": peachworksAccessToken
   });
-
-  for (key in otherQueries) {
-    if (hasOwnProperty.call(otherQueries, key)) {
-      resultQuery[key] = otherQueries[key]
-    }
-  }
 
   const resultQs = queryString.stringify(resultQuery);
 
@@ -34,23 +28,25 @@ const stripAccessToken = (peachJson) => {
   return peachJsonCopy
 }
 
-const fetchAndRespond = (apiUrl, res) => {
+const fetchAndRespond = (apiUrl) => {
   // proof of concept, may need to handle failed (non-json) responses.
   // access_token is stripped out of the params property if present to avoid leaking to client.
   // we also introduce an explicit page property for simpler client-side pagination logic.
-  fetch(apiUrl)
-    .then(apiRes => apiRes.json())
-    .then(json => {
-      if (json.error) {
-        res.json(json);
-      } else {
-        const cleanedJson = stripAccessToken(json)
-        res.json({
-          json: cleanedJson,
-          page: getPage(cleanedJson)
-        });
-      }
-    });
+  return new Promise((resolve, reject) => {
+    fetch(apiUrl)
+      .then(apiRes => apiRes.json())
+      .then(json => {
+        if (json.error) {
+          reject(json);
+        } else {
+          const cleanedJson = stripAccessToken(json)
+          resolve({
+            json: cleanedJson,
+            page: getPage(cleanedJson)
+          });
+        }
+      });
+  });
 }
 
 const getPage = (peachJson) => {
@@ -65,31 +61,33 @@ const getPage = (peachJson) => {
   return page;
 }
 
-const proxyGetRecipes = (req, res) => {
-  const apiUrl = peachworksApiUrl(req.query, "wtm_recipes");
-  fetchAndRespond(apiUrl, res);
+const proxyGetRecipes = () => {
+  const apiUrl = peachworksApiUrl("wtm_recipes");
+  return fetchAndRespond(apiUrl);
 }
 
 /*
  * TODO:
  * make an array of inventory item_id, fetch their item info
  * /wtm_inv_items?access_token=<token>&find={"id":{"$in":[<ids>]}}
+ *
+ * fetch a unit of measure's data
  */
 
 // fetch inventory for id
 // /wtm_recipe_items?access_token=<token>&find={"recipe_id":<id>}
-const proxyGetInventory = (req, res) => {
-  const otherQueries = {find: '{"recipe_id":' + req.params.id + '}'}
-  const apiUrl = peachworksApiUrl(req.query, "wtm_recipe_items", otherQueries);
-  fetchAndRespond(apiUrl, res);
+const proxyGetInventory = (id) => {
+  const otherQueries = {find: '{"recipe_id":' + id + '}'}
+  const apiUrl = peachworksApiUrl("wtm_recipe_items", otherQueries);
+  return fetchAndRespond(apiUrl);
 }
 
 // fetch instructions for id
 // /wtm_recipe_instructions?access_token=<token>&find={"recipe_id":<id>}
-const proxyGetInstructions = (req, res) => {
-  const otherQueries = {find: '{"recipe_id":' + req.params.id + '}'}
-  const apiUrl = peachworksApiUrl(req.query, "wtm_recipe_instructions", otherQueries);
-  fetchAndRespond(apiUrl, res);
+const proxyGetInstructions = (id) => {
+  const otherQueries = {find: '{"recipe_id":' + id + '}'}
+  const apiUrl = peachworksApiUrl("wtm_recipe_instructions", otherQueries);
+  return fetchAndRespond(apiUrl);
 }
 
 module.exports = {

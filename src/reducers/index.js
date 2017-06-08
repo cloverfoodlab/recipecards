@@ -21,8 +21,7 @@ const recipes = (state = defaultState, action) => {
       console.log("error loading recipes: " + action.error)
       return state
 
-    //using load inventory as signal that we're loading recipe
-    case 'LOAD_INVENTORY':
+    case 'LOAD_RECIPE':
       if (state.recipes.find(recipe => recipe.id === action.id)) {
         return state
       } else {
@@ -49,41 +48,11 @@ const recipes = (state = defaultState, action) => {
 
 const recipe = (state, action) => {
   switch (action.type) {
-    case 'LOAD_INVENTORY_SUCCESS':
-      console.log(action.payload);
-      const ingredientsJson = action.payload.data.json.results;
-      const ingredientsData = ingredientsJson.map(i => {
-        return {
-          quantity: i.common_quantity,
-          unit: i.common_unit_id //TODO: convert to human readable,
-          //name: TODO
-        }
-      });
+    case 'LOAD_RECIPE_SUCCESS':
+      return {...action.payload.data, ...state};
 
-      return {...state,
-        ingredients: ingredientsData
-      }
-
-    case 'LOAD_INVENTORY_FAIL':
-      console.log("error loading inventory: " + action.error)
-      return state
-
-    case 'LOAD_INSTRUCTIONS_SUCCESS':
-      console.log(action.payload)
-      const instructionsJson = action.payload.data.json.results
-      const instructionsData = instructionsJson.map(i => {
-        return {
-          //TODO: this is hilariously in terrible html
-          content: i.content
-        }
-      })
-
-      return {...state,
-        instructions: instructionsData
-      }
-
-    case 'LOAD_INSTRUCTIONS_FAIL':
-      console.log("error loading instructions: " + action.error)
+    case 'LOAD_RECIPE_FAIL':
+      console.log("error loading recipe: " + action.error)
       return state
 
     default:

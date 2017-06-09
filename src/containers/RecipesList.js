@@ -1,45 +1,42 @@
-import 'babel-polyfill'
-import React, { Component, PropTypes } from 'react'
-import { connect } from 'react-redux'
+import "babel-polyfill";
+import React, { Component, PropTypes } from "react";
+import { connect } from "react-redux";
 
-import { loadRecipes } from '../actions'
-import RecipeLink from '../components/RecipeLink'
+import { loadRecipes } from "../actions";
+import RecipeLink from "../components/RecipeLink";
 
 class RecipesList extends Component {
   constructor(props) {
-    super()
-    props.onLoad()
+    super();
+    props.onLoad();
   }
 
   render() {
-    const { recipes } = this.props
+    const { recipes } = this.props;
     return (
       <div className="recipes">
         <h1>Recipes</h1>
-        { recipes.map(recipe => <RecipeLink { ...recipe } />) }
+        {recipes.map(recipe => <RecipeLink {...recipe} />)}
       </div>
-    )
+    );
   }
 }
 
 RecipesList.propTypes = {
   recipes: PropTypes.array.isRequired,
   onLoad: PropTypes.func
-}
+};
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     recipes: state.recipeList
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     onLoad: () => dispatch(loadRecipes())
-  }
-}
+  };
+};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RecipesList)
+export default connect(mapStateToProps, mapDispatchToProps)(RecipesList);

@@ -4,8 +4,13 @@
     "modules": true
   },
   "env": {
-    "browser": true
+    "browser": true,
+    "node": true
   },
+  "extends": [
+    "prettier",
+    "prettier/react"
+  ],
   "parser": "babel-eslint",
   "plugins": [
     "react"

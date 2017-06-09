@@ -1,45 +1,46 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const peachworks = require('./peachworks');
-const db = require('./db');
+const peachworks = require("./peachworks");
+const db = require("./db");
 
-app.get('/api/recipes', function (req, res) {
+app.get("/api/recipes", function(req, res) {
   db.getRecipes(req, res);
 });
 
-app.get('/api/recipe/:id', function (req, res) {
+app.get("/api/recipe/:id", function(req, res) {
   db.getRecipe(req, res);
 });
 
-const webpack = require('webpack');
-const path = require('path');
+const path = require("path");
 
 if (process.env.NODE_ENV !== "production") {
-  app.use('/dist', express.static('static'));
+  app.use("/dist", express.static("static"));
 
-  const config = require('../webpack.config.dev');
-
+  const webpack = require("webpack");
+  const config = require("../webpack.config.dev");
   const compiler = webpack(config);
-  const webpackDevMiddleware = require('webpack-dev-middleware');
+  const webpackDevMiddleware = require("webpack-dev-middleware");
 
-  app.use(webpackDevMiddleware(compiler, {
-    noInfo: true,
-    publicPath: config.output.publicPath
-  }));
+  app.use(
+    webpackDevMiddleware(compiler, {
+      noInfo: true,
+      publicPath: config.output.publicPath
+    })
+  );
 
-  const webpackHotMiddleware = require('webpack-hot-middleware');
+  const webpackHotMiddleware = require("webpack-hot-middleware");
   app.use(webpackHotMiddleware(compiler));
 } else {
-  app.use('/dist', express.static('dist'));
+  app.use("/dist", express.static("dist"));
 }
 
-app.get('/', function(req, res) {
-  let index_path = path.resolve(__dirname, '../index.html');
+app.get("/", function(req, res) {
+  let index_path = path.resolve(__dirname, "../index.html");
   res.sendFile(index_path);
 });
 
-app.get('/recipe/:id', function(req, res) {
-  let index_path = path.resolve(__dirname, '../index.html');
+app.get("/recipe/:id", function(req, res) {
+  let index_path = path.resolve(__dirname, "../index.html");
   res.sendFile(index_path);
 });
 

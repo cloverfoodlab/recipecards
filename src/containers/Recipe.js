@@ -1,35 +1,42 @@
-import 'babel-polyfill'
-import React, { Component, PropTypes } from 'react'
-import { connect } from 'react-redux'
+import "babel-polyfill";
+import React, { Component, PropTypes } from "react";
+import { connect } from "react-redux";
 
-import { loadRecipe } from '../actions'
-import Ingredient from '../components/Ingredient'
-import Instruction from '../components/Instruction'
+import { loadRecipe } from "../actions";
+import Ingredient from "../components/Ingredient";
+import Instruction from "../components/Instruction";
 
 class Recipe extends Component {
   constructor(props) {
-    super()
-    props.onLoad(props.recipe.id)
+    super();
+    props.onLoad(props.recipe.id);
   }
 
   render() {
-    const {id, name, yieldAmount, description, inventory, instructions} = this.props.recipe
+    const {
+      id,
+      name,
+      yieldAmount,
+      description,
+      inventory,
+      instructions
+    } = this.props.recipe;
 
     return (
-      <div className="recipe" onLoad={ () => onLoad(id) }>
-        <div>Name: { name }</div>
-        <div>Yield: { yieldAmount }</div>
-        <div>{ description }</div>
+      <div className="recipe" onLoad={() => onLoad(id)}>
+        <div>Name: {name}</div>
+        <div>Yield: {yieldAmount}</div>
+        <div>{description}</div>
         <div className="ingredients">
           <div>Ingredients</div>
-          { inventory && inventory.map(i => <Ingredient { ...i } />) }
+          {inventory && inventory.map(i => <Ingredient {...i} />)}
         </div>
         <div className="instructions">
           <div>Method of Prep</div>
-          { instructions && instructions.map(i => <Instruction { ...i } />) }
+          {instructions && instructions.map(i => <Instruction {...i} />)}
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -42,25 +49,21 @@ Recipe.propTypes = {
   instructions: PropTypes.array,
   onLoad: PropTypes.func
   //TODO: subrecipes how organize
-}
+};
 
 const mapStateToProps = (state, ownProps) => {
-  const urlId = parseInt(ownProps.match.params[0], 10)
+  const urlId = parseInt(ownProps.match.params[0], 10);
   return {
     recipe: state.recipes.find(recipe => recipe.id === urlId) || { id: urlId }
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    onLoad: (id) => {
-      dispatch(loadRecipe(id))
+    onLoad: id => {
+      dispatch(loadRecipe(id));
     }
-  }
-}
+  };
+};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Recipe)
-
+export default connect(mapStateToProps, mapDispatchToProps)(Recipe);

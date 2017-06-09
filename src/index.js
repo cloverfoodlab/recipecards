@@ -1,37 +1,34 @@
-import 'babel-polyfill'
-import axios from 'axios'
-import axiosMiddleware from 'redux-axios-middleware'
-import React from 'react'
-import { render } from 'react-dom'
-import { Provider } from 'react-redux'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import thunk from 'redux-thunk';
-import { createStore, applyMiddleware } from 'redux'
+import "babel-polyfill";
+import axios from "axios";
+import axiosMiddleware from "redux-axios-middleware";
+import React from "react";
+import { render } from "react-dom";
+import { Provider } from "react-redux";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import thunk from "redux-thunk";
+import { createStore, applyMiddleware } from "redux";
 
-import recipes from './reducers'
-import Recipe from './containers/Recipe'
-import RecipesList from './containers/RecipesList'
+import recipes from "./reducers";
+import Recipe from "./containers/Recipe";
+import RecipesList from "./containers/RecipesList";
 
 const client = axios.create({
-  baseURL:'/api',
-  responseType: 'json'
+  baseURL: "/api",
+  responseType: "json"
 });
 let store = createStore(
   recipes,
-  applyMiddleware(
-    axiosMiddleware(client),
-    thunk
-  )
-)
+  applyMiddleware(axiosMiddleware(client), thunk)
+);
 
 render(
-  <Provider store= { store }>
+  <Provider store={store}>
     <Router>
       <div>
-        <Route exact path="/" component={ RecipesList }/>
-        <Route path="/recipe/(\d+)" component={ Recipe }/>
+        <Route exact path="/" component={RecipesList} />
+        <Route path="/recipe/(\d+)" component={Recipe} />
       </div>
     </Router>
   </Provider>,
-  document.getElementById('root')
-)
+  document.getElementById("root")
+);

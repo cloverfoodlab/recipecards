@@ -46,7 +46,7 @@ const fetchAndRespond = apiUrl => {
       } else {
         const cleanedJson = stripAccessToken(json);
         resolve({
-          json: cleanedJson,
+          json: cleanedJson.results,
           page: getPage(cleanedJson)
         });
       }
@@ -71,14 +71,6 @@ const proxyGetRecipes = () => {
   return fetchAndRespond(apiUrl);
 };
 
-/*
- * TODO:
- * make an array of inventory item_id, fetch their item info
- * /wtm_inv_items?access_token=<token>&find={"id":{"$in":[<ids>]}}
- *
- * fetch a unit of measure's data
- */
-
 // fetch inventory for id
 // /wtm_recipe_items?access_token=<token>&find={"recipe_id":<id>}
 const proxyGetInventory = id => {
@@ -95,8 +87,26 @@ const proxyGetInstructions = id => {
   return fetchAndRespond(apiUrl);
 };
 
+// fetch item info for inventory item_ids
+// /wtm_inv_items?access_token=<token>&find={"id":{"$in":[<ids>]}}
+const proxyGetItems = ids => {
+  const otherQueries = { find: '{"id":{"$in":[' + ids.join() + "]}}" };
+  const apiUrl = peachworksApiUrl("wtm_inv_items", otherQueries);
+  return fetchAndRespond(apiUrl);
+};
+
+// fetch units of measures data
+// /wtm_units?access_token=<token>&find={"id":{"$in":[<ids>]}}
+const proxyGetUnits = ids => {
+  const otherQueries = { find: '{"id":{"$in":[' + ids.join() + "]}}" };
+  const apiUrl = peachworksApiUrl("wtm_units", otherQueries);
+  return fetchAndRespond(apiUrl);
+};
+
 module.exports = {
   proxyGetRecipes: proxyGetRecipes,
   proxyGetInventory: proxyGetInventory,
-  proxyGetInstructions: proxyGetInstructions
+  proxyGetInstructions: proxyGetInstructions,
+  proxyGetItems: proxyGetItems,
+  proxyGetUnits: proxyGetUnits
 };

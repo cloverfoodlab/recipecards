@@ -1,6 +1,7 @@
 const peachworks = require("./peachworks");
 const pouchDb = require("pouchdb");
 pouchDb.plugin(require("pouchdb-adapter-memory"));
+pouchDb.plugin(require("pouchdb-upsert"));
 pouchDb.plugin(require("relational-pouch"));
 
 let db = new pouchDb("peachworks", { adapter: "memory" });
@@ -9,51 +10,63 @@ let db = new pouchDb("peachworks", { adapter: "memory" });
 const getRecipes = (req, res) => {
   //TODO: move this out into a cron job
   fetchRecipesFromPeachworks(() => {
-    db.get("recipes").then(doc => {
-      res.json(doc.recipes);
-    });
+    db
+      .allDocs({
+        startkey: "recipe-",
+        endkey: "recipe-\uffff",
+        include_docs: true
+      })
+      .then(result => {
+        const allRecipes = result.rows.map(row => row.doc);
+        res.json({ recipes: allRecipes });
+      });
   });
 };
 
 //endpoint which fetches from db for recipe data
 const getRecipe = (req, res) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id, 10);
 
   //TODO: move this out into a cron job
   fetchRecipeFromPeachworks(id, () => {
     db.get("recipe-" + id).then(doc => {
-      res.json(doc.recipe);
+      res.json(doc);
     });
   });
 };
 
-const createOrUpdate = (doc, callback) => {
+const createOrUpdate = (newDoc, callback) => {
   db
-    .get(doc._id)
-    .then(_doc => {
-      doc._rev = _doc._rev;
-      db.put(doc);
+    .upsert(newDoc._id, storedDoc => {
+      return Object.assign({}, storedDoc, newDoc);
     })
     .catch(err => {
-      if (err.status === 404) {
-        db.put(doc);
-      } else {
-        throw err;
-      }
+      throw err;
     })
-    .then(() => callback());
+    .then(res => {
+      callback();
+    });
 };
 
 //pulls recipes data into db from peachworks
 const fetchRecipesFromPeachworks = callback => {
-  peachworks.proxyGetRecipes().then(recipes => {
-    createOrUpdate(
-      {
-        _id: "recipes",
-        recipes: recipes
-      },
-      callback
-    );
+  peachworks.proxyGetRecipes().then(recipesJson => {
+    const recipes = recipesJson.json.results;
+    const idRecipes = recipes.map(recipe => {
+      const recipeId = "recipe-" + recipe.id;
+      return Object.assign({}, recipe, { _id: recipeId });
+    });
+
+    const noop = () => {};
+    const promises = idRecipes.map(recipe => createOrUpdate(recipe, noop));
+
+    Promise.all(promises)
+      .catch(err => {
+        throw err;
+      })
+      .then(values => {
+        callback();
+      });
   });
 };
 
@@ -73,18 +86,13 @@ const fetchRecipeFromPeachworks = (id, callback) => {
         };
       });
       const recipe = {
+        _id: "recipe-" + id,
         id: id,
         inventory: inventory,
         instructions: instructions
       };
 
-      createOrUpdate(
-        {
-          _id: "recipe-" + id,
-          recipe: recipe
-        },
-        callback
-      );
+      createOrUpdate(recipe, callback);
     });
   });
 };

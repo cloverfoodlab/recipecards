@@ -11,7 +11,7 @@ const recipes = (state = defaultState, action) => {
 
     case "LOAD_RECIPES_SUCCESS":
       //TODO: process pages beyond the first one
-      const recipesJson = action.payload.data.json.results;
+      const recipesJson = action.payload.data.recipes;
       const recipeList = recipesJson.map(recipe => {
         return { name: recipe.name, id: recipe.id };
       });

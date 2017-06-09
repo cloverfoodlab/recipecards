@@ -51,7 +51,7 @@ const createOrUpdate = (newDoc, callback) => {
 //pulls recipes data into db from peachworks
 const fetchRecipesFromPeachworks = callback => {
   peachworks.proxyGetRecipes().then(recipesJson => {
-    const recipes = recipesJson.json.results;
+    const recipes = recipesJson.json;
     const idRecipes = recipes.map(recipe => {
       const recipeId = "recipe-" + recipe.id;
       return Object.assign({}, recipe, { _id: recipeId });
@@ -73,26 +73,46 @@ const fetchRecipesFromPeachworks = callback => {
 //pulls recipe data into db from peachworks
 const fetchRecipeFromPeachworks = (id, callback) => {
   peachworks.proxyGetInventory(id).then(invJson => {
+    let inventory = invJson.json.map(i => {
+      return {
+        //TODO: what is quantity vs common_quantity?
+        quantity: parseFloat(i.quantity),
+        itemId: i.item_id,
+        unitId: i.unit_id
+      };
+    });
+
     peachworks.proxyGetInstructions(id).then(insJson => {
-      const inventory = invJson.json.results.map(i => {
-        return {
-          quantity: i.common_quantity,
-          unit: i.common_unit_id
-        };
-      });
-      const instructions = insJson.json.results.map(i => {
+      const instructions = insJson.json.map(i => {
         return {
           content: i.content
         };
       });
-      const recipe = {
-        _id: "recipe-" + id,
-        id: id,
-        inventory: inventory,
-        instructions: instructions
-      };
 
-      createOrUpdate(recipe, callback);
+      const itemIds = inventory.map(i => i.itemId);
+      peachworks.proxyGetItems(itemIds).then(itemsJson => {
+        inventory = inventory.map(i => {
+          const item = itemsJson.json.find(item => i.itemId === item.id)
+          return Object.assign(i, {name: item.name});
+        });
+
+        const unitIds = inventory.map(i => i.unitId);
+        peachworks.proxyGetUnits(unitIds).then(unitsJson => {
+          inventory = inventory.map(i => {
+            const unit = unitsJson.json.find(unit => i.unitId === unit.id)
+            return Object.assign(i, {unit: unit.abbr});
+          });
+
+          const recipe = {
+            _id: "recipe-" + id,
+            id: id,
+            inventory: inventory,
+            instructions: instructions
+          };
+
+          createOrUpdate(recipe, callback);
+        });
+      });
     });
   });
 };

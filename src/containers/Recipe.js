@@ -22,17 +22,21 @@ class Recipe extends Component {
       instructions
     } = this.props.recipe;
 
+    const ingStyle = {
+      margin: '10px 0'
+    }
+
     return (
       <div className="recipe" onLoad={() => onLoad(id)}>
         <div>Name: {name}</div>
         <div>Yield: {yieldAmount}</div>
         <div>{description}</div>
-        <div className="ingredients">
-          <div>Ingredients</div>
+        <div className="ingredients" style={ingStyle}>
+          <h1>Ingredients</h1>
           {inventory && inventory.map(i => <Ingredient {...i} />)}
         </div>
         <div className="instructions">
-          <div>Method of Prep</div>
+          <h1>Method of Prep</h1>
           {instructions && instructions.map(i => <Instruction {...i} />)}
         </div>
       </div>

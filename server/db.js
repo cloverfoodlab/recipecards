@@ -26,6 +26,9 @@ const getRecipes = (req, res) => {
 //endpoint which fetches from db for recipe data
 const getRecipe = (req, res) => {
   const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    throw "invalid id";
+  }
 
   //TODO: move this out into a cron job
   fetchRecipeFromPeachworks(id, () => {
@@ -49,9 +52,8 @@ const createOrUpdate = (newDoc, callback) => {
 };
 
 //pulls recipes data into db from peachworks
-const fetchRecipesFromPeachworks = callback => {
-  peachworks.proxyGetRecipes().then(recipesJson => {
-    const recipes = recipesJson.json;
+const fetchRecipesFromPeachworks = (callback, page = 1) => {
+  peachworks.proxyGetRecipes(page).then(recipes => {
     const idRecipes = recipes.map(recipe => {
       const recipeId = "recipe-" + recipe.id;
       return Object.assign({}, recipe, { _id: recipeId });
@@ -65,7 +67,11 @@ const fetchRecipesFromPeachworks = callback => {
         throw err;
       })
       .then(values => {
-        callback();
+        if (recipes.length === 0) {
+          callback();
+        } else {
+          fetchRecipesFromPeachworks(callback, page + 1);
+        }
       });
   });
 };
@@ -73,7 +79,7 @@ const fetchRecipesFromPeachworks = callback => {
 //pulls recipe data into db from peachworks
 const fetchRecipeFromPeachworks = (id, callback) => {
   peachworks.proxyGetInventory(id).then(invJson => {
-    let inventory = invJson.json.map(i => {
+    let inventory = invJson.map(i => {
       return {
         //TODO: what is quantity vs common_quantity?
         quantity: parseFloat(i.quantity),
@@ -83,7 +89,7 @@ const fetchRecipeFromPeachworks = (id, callback) => {
     });
 
     peachworks.proxyGetInstructions(id).then(insJson => {
-      const instructions = insJson.json.map(i => {
+      const instructions = insJson.map(i => {
         return {
           content: i.content
         };
@@ -92,15 +98,15 @@ const fetchRecipeFromPeachworks = (id, callback) => {
       const itemIds = inventory.map(i => i.itemId);
       peachworks.proxyGetItems(itemIds).then(itemsJson => {
         inventory = inventory.map(i => {
-          const item = itemsJson.json.find(item => i.itemId === item.id)
-          return Object.assign(i, {name: item.name});
+          const item = itemsJson.find(item => i.itemId === item.id);
+          return Object.assign(i, { name: item.name });
         });
 
         const unitIds = inventory.map(i => i.unitId);
         peachworks.proxyGetUnits(unitIds).then(unitsJson => {
           inventory = inventory.map(i => {
-            const unit = unitsJson.json.find(unit => i.unitId === unit.id)
-            return Object.assign(i, {unit: unit.abbr});
+            const unit = unitsJson.find(unit => i.unitId === unit.id);
+            return Object.assign(i, { unit: unit.abbr });
           });
 
           const recipe = {

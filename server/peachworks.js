@@ -2,12 +2,14 @@ const fetch = require("node-fetch");
 const queryString = require("query-string");
 
 // for every URL path that starts with /api/, send request to upstream API service
-const peachworksApiUrl = (url, otherQueries = {}) => {
+const peachworksApiUrl = (url, otherQueries = {}, page = 1, limit = 100) => {
   const peachworksAccountId = process.env.PEACHWORKS_ACCOUNT_ID;
   const peachworksAccessToken = process.env.PEACHWORKS_ACCESS_TOKEN;
 
   let resultQuery = Object.assign({}, otherQueries, {
-    access_token: peachworksAccessToken
+    access_token: peachworksAccessToken,
+    limit: limit,
+    page: page
   });
 
   const resultQs = queryString.stringify(resultQuery);
@@ -45,29 +47,14 @@ const fetchAndRespond = apiUrl => {
         reject(json);
       } else {
         const cleanedJson = stripAccessToken(json);
-        resolve({
-          json: cleanedJson.results,
-          page: getPage(cleanedJson)
-        });
+        resolve(cleanedJson.results);
       }
     });
   });
 };
 
-const getPage = peachJson => {
-  let page = 1;
-  if (peachJson.params) {
-    const pageString = peachJson.params["page"] || "1";
-    page = parseInt(pageString, 10);
-    if (isNaN(page)) {
-      page = 1;
-    }
-  }
-  return page;
-};
-
-const proxyGetRecipes = () => {
-  const apiUrl = peachworksApiUrl("wtm_recipes");
+const proxyGetRecipes = (page = 1) => {
+  const apiUrl = peachworksApiUrl("wtm_recipes", {}, page);
   return fetchAndRespond(apiUrl);
 };
 

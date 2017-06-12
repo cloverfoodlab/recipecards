@@ -23,8 +23,8 @@ class Recipe extends Component {
     } = this.props.recipe;
 
     const ingStyle = {
-      margin: '10px 0'
-    }
+      margin: "10px 0"
+    };
 
     return (
       <div className="recipe" onLoad={() => onLoad(id)}>

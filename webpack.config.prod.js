@@ -1,9 +1,9 @@
-var path = require("path");
-var webpack = require("webpack");
+let path = require("path");
+let webpack = require("webpack");
 
 module.exports = {
   devtool: "source-map",
-  entry: ["./src/index"],
+  entry: ["./client/index"],
   output: {
     path: path.join(__dirname, "dist"),
     filename: "bundle.js",
@@ -27,7 +27,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: "babel-loader",
-        include: path.join(__dirname, "src"),
+        include: path.join(__dirname, "client"),
         exclude: /node_modules/
       },
       {

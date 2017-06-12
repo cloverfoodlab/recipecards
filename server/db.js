@@ -1,10 +1,10 @@
 const peachworks = require("./peachworks");
-const pouchDb = require("pouchdb");
-pouchDb.plugin(require("pouchdb-adapter-memory"));
-pouchDb.plugin(require("pouchdb-upsert"));
-pouchDb.plugin(require("relational-pouch"));
+const PouchDb = require("pouchdb");
+PouchDb.plugin(require("pouchdb-adapter-memory"));
+PouchDb.plugin(require("pouchdb-upsert"));
+PouchDb.plugin(require("relational-pouch"));
 
-let db = new pouchDb("peachworks", { adapter: "memory" });
+let db = new PouchDb("peachworks", { adapter: "memory" });
 
 //endpoint which fetches from db for recipes data
 const getRecipes = (req, res) => {
@@ -27,7 +27,7 @@ const getRecipes = (req, res) => {
 const getRecipe = (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) {
-    throw "invalid id";
+    throw new Error("invalid id");
   }
 
   //TODO: move this out into a cron job
@@ -97,15 +97,15 @@ const fetchRecipeFromPeachworks = (id, callback) => {
 
       const itemIds = inventory.map(i => i.itemId);
       peachworks.proxyGetItems(itemIds).then(itemsJson => {
-        inventory = inventory.map(i => {
-          const item = itemsJson.find(item => i.itemId === item.id);
+        inventory = inventory.map(inv => {
+          const item = itemsJson.find(it => inv.itemId === it.id);
           return Object.assign(i, { name: item.name });
         });
 
         const unitIds = inventory.map(i => i.unitId);
         peachworks.proxyGetUnits(unitIds).then(unitsJson => {
           inventory = inventory.map(i => {
-            const unit = unitsJson.find(unit => i.unitId === unit.id);
+            const unit = unitsJson.find(u => i.unitId === u.id);
             return Object.assign(i, { unit: unit.abbr });
           });
 

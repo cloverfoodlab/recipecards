@@ -90,10 +90,20 @@ const proxyGetUnits = ids => {
   return fetchAndRespond(apiUrl);
 };
 
+// fetch custom units
+// wtm_inv_item_units?access_token=<token>&find={"id":{"$in":[<ids>]}}
+
+const proxyGetCustomUnits = ids => {
+  const otherQueries = { find: '{"id":{"$in":[' + ids.join() + "]}}" };
+  const apiUrl = peachworksApiUrl("wtm_inv_item_units", otherQueries);
+  return fetchAndRespond(apiUrl);
+};
+
 module.exports = {
   proxyGetRecipes: proxyGetRecipes,
   proxyGetInventory: proxyGetInventory,
   proxyGetInstructions: proxyGetInstructions,
   proxyGetItems: proxyGetItems,
-  proxyGetUnits: proxyGetUnits
+  proxyGetUnits: proxyGetUnits,
+  proxyGetCustomUnits: proxyGetCustomUnits
 };

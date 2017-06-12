@@ -81,12 +81,27 @@ const fetchRecipeFromPeachworks = (id, callback) => {
   peachworks.proxyGetInventory(id).then(invJson => {
     let inventory = invJson.map(i => {
       return {
-        //TODO: what is quantity vs common_quantity?
         quantity: parseFloat(i.quantity),
         itemId: i.item_id,
-        unitId: i.unit_id
+        unitId: i.unit_id,
+        customUnitId: i.each_unit_id
       };
     });
+
+    const fetchForInv = (idKey, peachworksApi, invKey, jsonKey) => {
+      const ids = inventory.map(i => i[idKey]).filter(i => i);
+
+      return peachworksApi(ids).then(json => {
+        inventory = inventory.map(i => {
+          if (i[idKey]) {
+            const jsonItem = json.find(j => i[idKey] === j.id);
+            //TODO this is pretty gross... any better way to do this?
+            i[invKey] = jsonItem[jsonKey];
+          }
+          return i;
+        });
+      });
+    };
 
     peachworks.proxyGetInstructions(id).then(insJson => {
       const instructions = insJson.map(i => {
@@ -95,20 +110,22 @@ const fetchRecipeFromPeachworks = (id, callback) => {
         };
       });
 
-      const itemIds = inventory.map(i => i.itemId);
-      peachworks.proxyGetItems(itemIds).then(itemsJson => {
-        inventory = inventory.map(inv => {
-          const item = itemsJson.find(it => inv.itemId === it.id);
-          return Object.assign(i, { name: item.name });
-        });
+      const promises = [
+        fetchForInv("itemId", peachworks.proxyGetItems, "name", "name"),
+        fetchForInv("unitId", peachworks.proxyGetUnits, "unit", "name"),
+        fetchForInv(
+          "customUnitId",
+          peachworks.proxyGetCustomUnits,
+          "customUnit",
+          "description"
+        )
+      ];
 
-        const unitIds = inventory.map(i => i.unitId);
-        peachworks.proxyGetUnits(unitIds).then(unitsJson => {
-          inventory = inventory.map(i => {
-            const unit = unitsJson.find(u => i.unitId === u.id);
-            return Object.assign(i, { unit: unit.abbr });
-          });
-
+      Promise.all(promises)
+        .catch(err => {
+          throw err;
+        })
+        .then(values => {
           const recipe = {
             _id: "recipe-" + id,
             id: id,
@@ -118,7 +135,6 @@ const fetchRecipeFromPeachworks = (id, callback) => {
 
           createOrUpdate(recipe, callback);
         });
-      });
     });
   });
 };

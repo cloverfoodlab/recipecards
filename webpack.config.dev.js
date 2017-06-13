@@ -23,10 +23,6 @@ module.exports = {
         loader: "babel-loader",
         include: path.join(__dirname, "client"),
         exclude: /node_modules/
-      },
-      {
-        test: /\.scss$/,
-        loaders: ["style", "css", "sass"]
       }
     ]
   }

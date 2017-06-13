@@ -30,12 +30,24 @@ const getRecipe = (req, res) => {
     throw new Error("invalid id");
   }
 
-  //TODO: move this out into a cron job
-  fetchRecipeFromPeachworks(id, () => {
-    db.get("recipe-" + id).then(doc => {
-      res.json(doc);
+  const dbId = "recipe-" + id;
+  db
+    .get(dbId)
+    .then(recipe => {
+      res.json(recipe);
+    })
+    .catch(err => {
+      if (err.status !== 404) {
+        throw err;
+      }
+
+      //TODO: move this out into a cron job
+      fetchRecipeFromPeachworks(id, () => {
+        db.get(dbId).then(recipe => {
+          res.json(recipe);
+        });
+      });
     });
-  });
 };
 
 const createOrUpdate = (newDoc, callback) => {
@@ -76,6 +88,26 @@ const fetchRecipesFromPeachworks = (callback, page = 1) => {
   });
 };
 
+/*
+ peachworks returns a terrible interface for instructions content,
+ something along the lines of:
+
+ "<p><ol><li>INSTRUCTION 1<br></li><li>INSTRUCTION 2<br></li></ol></p>"
+
+ we want to convert this to ["INSTRUCTION 1", "INSTRUCTION 2"]
+ */
+const extractContent = html => {
+  const newHtml = html
+    .replace(/<br>/gi, "")
+    .replace(/<\/p>/gi, "")
+    .replace(/<p>/gi, "")
+    .replace(/<ol>/gi, "")
+    .replace(/<\/ol>/gi, "")
+    .replace(/<\/li>/gi, "");
+
+  return newHtml.split("<li>").filter(i => i !== "");
+};
+
 //pulls recipe data into db from peachworks
 const fetchRecipeFromPeachworks = (id, callback) => {
   peachworks.proxyGetInventory(id).then(invJson => {
@@ -94,8 +126,8 @@ const fetchRecipeFromPeachworks = (id, callback) => {
       return peachworksApi(ids).then(json => {
         inventory = inventory.map(i => {
           if (i[idKey]) {
-            const jsonItem = json.find(j => i[idKey] === j.id);
             //TODO this is pretty gross... any better way to do this?
+            const jsonItem = json.find(j => i[idKey] === j.id);
             i[invKey] = jsonItem[jsonKey];
           }
           return i;
@@ -103,29 +135,31 @@ const fetchRecipeFromPeachworks = (id, callback) => {
       });
     };
 
-    peachworks.proxyGetInstructions(id).then(insJson => {
-      const instructions = insJson.map(i => {
-        return {
-          content: i.content
-        };
-      });
+    const promises = [
+      fetchForInv("itemId", peachworks.proxyGetItems, "name", "name"),
+      fetchForInv("unitId", peachworks.proxyGetUnits, "unit", "name"),
+      fetchForInv(
+        "customUnitId",
+        peachworks.proxyGetCustomUnits,
+        "customUnit",
+        "description"
+      )
+    ];
 
-      const promises = [
-        fetchForInv("itemId", peachworks.proxyGetItems, "name", "name"),
-        fetchForInv("unitId", peachworks.proxyGetUnits, "unit", "name"),
-        fetchForInv(
-          "customUnitId",
-          peachworks.proxyGetCustomUnits,
-          "customUnit",
-          "description"
-        )
-      ];
+    Promise.all(promises)
+      .catch(err => {
+        throw err;
+      })
+      .then(values => {
+        peachworks.proxyGetInstructions(id).then(insJson => {
+          const instructionsArray = insJson.map(i => extractContent(i.content));
+          //basically flatMap
+          const instructions = [].concat(...instructionsArray).map(i => {
+            return {
+              content: i
+            };
+          });
 
-      Promise.all(promises)
-        .catch(err => {
-          throw err;
-        })
-        .then(values => {
           const recipe = {
             _id: "recipe-" + id,
             id: id,
@@ -135,7 +169,7 @@ const fetchRecipeFromPeachworks = (id, callback) => {
 
           createOrUpdate(recipe, callback);
         });
-    });
+      });
   });
 };
 

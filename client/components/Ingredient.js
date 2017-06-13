@@ -2,8 +2,24 @@ import "babel-polyfill";
 import React, { PropTypes } from "react";
 
 const Ingredient = ({ quantity, unit, name, customUnit }) => {
-  const wholeUnit = customUnit ? customUnit : unit;
-  return <div>{quantity} {wholeUnit} {name}</div>;
+  const style = {
+    margin: "3px 0"
+  };
+  const unitStyle = {
+    color: "#333"
+  };
+  const nameStyle = {
+    fontWeight: "bold",
+    margin: "0 0 0 5px"
+  };
+
+  const wholeUnit = (customUnit ? customUnit : unit).toLowerCase();
+  return (
+    <div className="ingredient" style={style}>
+      <span style={unitStyle}>{quantity} {wholeUnit}</span>
+      <span style={nameStyle}>{name}</span>
+    </div>
+  );
 };
 
 Ingredient.propTypes = {

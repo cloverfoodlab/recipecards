@@ -19,7 +19,7 @@ const recipes = (state = defaultState, action) => {
           isMenuRecipe: recipe.isMenuRecipe
         };
       });
-      return { ...state, recipeList: recipeList };
+      return { ...state, recipeList: recipeList, loaded: true };
 
     case "LOAD_RECIPES_FAIL":
       console.log("error loading recipes: " + action.error);
@@ -56,7 +56,7 @@ const recipes = (state = defaultState, action) => {
 const recipe = (state, action) => {
   switch (action.type) {
     case "LOAD_RECIPE_SUCCESS":
-      return { ...action.payload.data, ...state };
+      return { ...action.payload.data, ...state, loaded: true };
 
     case "LOAD_RECIPE_FAIL":
       console.log("error loading recipe: " + action.error);

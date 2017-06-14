@@ -1,6 +1,7 @@
 import "babel-polyfill";
 import React, { Component, PropTypes } from "react";
 import { connect } from "react-redux";
+import Spinner from "react-spinkit";
 
 import { loadRecipe } from "../actions";
 import Ingredient from "../components/Ingredient";
@@ -20,7 +21,8 @@ class Recipe extends Component {
       description,
       inventory,
       instructions,
-      isMenuRecipe
+      isMenuRecipe,
+      loaded
     } = this.props.recipe;
 
     const recStyle = {
@@ -37,20 +39,24 @@ class Recipe extends Component {
       display: "block"
     };
 
-    return (
-      <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
-        <h1 style={h1Style}>Name: {name}</h1>
-        <div>{description ? "Yield: " + description : ""}</div>
-        <div className="ingredients" style={ingStyle}>
-          <h1 style={h1Style}>Ingredients:</h1>
-          {inventory && inventory.map(i => <Ingredient {...i} />)}
+    if (loaded) {
+      return (
+        <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
+          <h1 style={h1Style}>Name: {name}</h1>
+          <div>{description ? "Yield: " + description : ""}</div>
+          <div className="ingredients" style={ingStyle}>
+            <h1 style={h1Style}>Ingredients:</h1>
+            {inventory && inventory.map(i => <Ingredient {...i} />)}
+          </div>
+          <div className="instructions">
+            <h1 style={h1Style}>Method of Prep:</h1>
+            {instructions && instructions.map(i => <Instruction {...i} />)}
+          </div>
         </div>
-        <div className="instructions">
-          <h1 style={h1Style}>Method of Prep:</h1>
-          {instructions && instructions.map(i => <Instruction {...i} />)}
-        </div>
-      </div>
-    );
+      );
+    } else {
+      return <Spinner name="spinner" />;
+    }
   }
 }
 
@@ -62,7 +68,8 @@ Recipe.propTypes = {
   ingredients: PropTypes.array,
   instructions: PropTypes.array,
   isMenuRecipe: PropTypes.bool,
-  onLoad: PropTypes.func
+  onLoad: PropTypes.func,
+  loaded: PropTypes.bool
   //TODO: subrecipes how organize
 };
 
@@ -73,7 +80,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     recipe: state.recipes.find(recipe => recipe.id === urlId) || {
       id: urlId,
-      isMenuRecipe: isMenuRecipe
+      isMenuRecipe: isMenuRecipe,
+      loaded: state.loaded
     }
   };
 };

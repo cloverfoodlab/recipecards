@@ -20,9 +20,9 @@ class RecipesList extends Component {
     };
 
     const h1Style = {
-      fontSize: "18px",
+      fontSize: "30px",
       fontWeight: "bold",
-      margin: "10px 0 5px 0"
+      margin: "30px 0 10px 5px"
     };
 
     if (loaded) {

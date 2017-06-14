@@ -6,7 +6,8 @@ const RecipeLink = ({ id, name, isMenuRecipe }) => {
   const linkPrefix = isMenuRecipe ? "/menu_recipe/" : "/prep_recipe/";
 
   const style = {
-    padding: "10px",
+    padding: "20px",
+    fontSize: "24px",
     display: "inline-block",
     border: "1px solid #ccc",
     margin: "5px"

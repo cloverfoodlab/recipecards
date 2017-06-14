@@ -1,6 +1,10 @@
 const defaultState = {
   recipeList: [],
-  recipes: []
+  recipes: {}
+};
+
+const keyId = (id, isMenuRecipe) => {
+  return isMenuRecipe ? "menu" + id : "prep" + id;
 };
 
 const recipes = (state = defaultState, action) => {
@@ -26,30 +30,22 @@ const recipes = (state = defaultState, action) => {
       return state;
 
     case "LOAD_RECIPE":
-      if (state.recipes.find(recipe => recipe.id === action.id)) {
-        return state;
-      } else {
-        return {
-          ...state,
-          recipes: [
-            ...state.recipes,
-            {
-              id: action.id
-            }
-          ]
+      if (!state.recipes[keyId(action.id, action.isMenuRecipe)]) {
+        state.recipes[keyId(action.id, action.isMenuRecipe)] = {
+          id: action.id,
+          isMenuRecipe: action.isMenuRecipe,
+          loaded: false
         };
       }
 
+      return state;
+
     default:
-      return {
-        ...state,
-        /*
-   * TODO: is there a nice way to map the key-value pairs for an object or something like that?
-   * basically a clean way to pass to recipe function here,
-   * while also making LOAD_INVENTORY and the mapStateToProps in containers/Recipe.js cleaner
-   */
-        recipes: state.recipes.map(r => recipe(r, action))
-      };
+      Object.keys(state.recipes).forEach(key => {
+        state.recipes[key] = recipe(state.recipes[key], action);
+      });
+
+      return state;
   }
 };
 

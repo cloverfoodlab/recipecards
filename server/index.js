@@ -2,24 +2,24 @@ const express = require("express");
 const app = express();
 const peachworks = require("./peachworks");
 const db = require("./db");
+const webpack = require("webpack");
+const webpackDevMiddleware = require("webpack-dev-middleware");
+const webpackHotMiddleware = require("webpack-hot-middleware");
+const config = require("../webpack.config.dev");
+const path = require("path");
 
-app.get("/api/recipes", function(req, res) {
+app.get("/api/recipes", (req, res) => {
   db.getRecipes(req, res);
 });
 
-app.get("/api/recipe/:id", function(req, res) {
+app.get("/api/recipe/:id", (req, res) => {
   db.getRecipe(req, res);
 });
-
-const path = require("path");
 
 if (process.env.NODE_ENV !== "production") {
   app.use("/dist", express.static("static"));
 
-  const webpack = require("webpack");
-  const config = require("../webpack.config.dev");
   const compiler = webpack(config);
-  const webpackDevMiddleware = require("webpack-dev-middleware");
 
   app.use(
     webpackDevMiddleware(compiler, {
@@ -28,23 +28,22 @@ if (process.env.NODE_ENV !== "production") {
     })
   );
 
-  const webpackHotMiddleware = require("webpack-hot-middleware");
   app.use(webpackHotMiddleware(compiler));
 } else {
   app.use("/dist", express.static("dist"));
 }
 
-app.get("/", function(req, res) {
-  let index_path = path.resolve(__dirname, "../index.html");
-  res.sendFile(index_path);
+app.get("/", (req, res) => {
+  let indexPath = path.resolve(__dirname, "../index.html");
+  res.sendFile(indexPath);
 });
 
-app.get("/recipe/:id", function(req, res) {
-  let index_path = path.resolve(__dirname, "../index.html");
-  res.sendFile(index_path);
+app.get("/recipe/:id", (req, res) => {
+  let indexPath = path.resolve(__dirname, "../index.html");
+  res.sendFile(indexPath);
 });
 
-app.listen(3000, function(err) {
+app.listen(3000, err => {
   if (err) {
     console.log(err);
     return;

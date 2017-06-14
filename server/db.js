@@ -1,10 +1,10 @@
 const peachworks = require("./peachworks");
-const pouchDb = require("pouchdb");
-pouchDb.plugin(require("pouchdb-adapter-memory"));
-pouchDb.plugin(require("pouchdb-upsert"));
-pouchDb.plugin(require("relational-pouch"));
+const PouchDb = require("pouchdb");
+PouchDb.plugin(require("pouchdb-adapter-memory"));
+PouchDb.plugin(require("pouchdb-upsert"));
+PouchDb.plugin(require("relational-pouch"));
 
-let db = new pouchDb("peachworks", { adapter: "memory" });
+let db = new PouchDb("peachworks", { adapter: "memory" });
 
 //endpoint which fetches from db for recipes data
 const getRecipes = (req, res) => {
@@ -26,13 +26,28 @@ const getRecipes = (req, res) => {
 //endpoint which fetches from db for recipe data
 const getRecipe = (req, res) => {
   const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    throw new Error("invalid id");
+  }
 
-  //TODO: move this out into a cron job
-  fetchRecipeFromPeachworks(id, () => {
-    db.get("recipe-" + id).then(doc => {
-      res.json(doc);
+  const dbId = "recipe-" + id;
+  db
+    .get(dbId)
+    .then(recipe => {
+      res.json(recipe);
+    })
+    .catch(err => {
+      if (err.status !== 404) {
+        throw err;
+      }
+
+      //TODO: move this out into a cron job
+      fetchRecipeFromPeachworks(id, () => {
+        db.get(dbId).then(recipe => {
+          res.json(recipe);
+        });
+      });
     });
-  });
 };
 
 const createOrUpdate = (newDoc, callback) => {
@@ -49,9 +64,8 @@ const createOrUpdate = (newDoc, callback) => {
 };
 
 //pulls recipes data into db from peachworks
-const fetchRecipesFromPeachworks = callback => {
-  peachworks.proxyGetRecipes().then(recipesJson => {
-    const recipes = recipesJson.json;
+const fetchRecipesFromPeachworks = (callback, page = 1) => {
+  peachworks.proxyGetRecipes(page).then(recipes => {
     const idRecipes = recipes.map(recipe => {
       const recipeId = "recipe-" + recipe.id;
       return Object.assign({}, recipe, { _id: recipeId });
@@ -65,42 +79,85 @@ const fetchRecipesFromPeachworks = callback => {
         throw err;
       })
       .then(values => {
-        callback();
+        if (recipes.length === 0) {
+          callback();
+        } else {
+          fetchRecipesFromPeachworks(callback, page + 1);
+        }
       });
   });
+};
+
+/*
+ peachworks returns a terrible interface for instructions content,
+ something along the lines of:
+
+ "<p><ol><li>INSTRUCTION 1<br></li><li>INSTRUCTION 2<br></li></ol></p>"
+
+ we want to convert this to ["INSTRUCTION 1", "INSTRUCTION 2"]
+ */
+const extractContent = html => {
+  const newHtml = html
+    .replace(/<br>/gi, "")
+    .replace(/<\/p>/gi, "")
+    .replace(/<p>/gi, "")
+    .replace(/<ol>/gi, "")
+    .replace(/<\/ol>/gi, "")
+    .replace(/<\/li>/gi, "");
+
+  return newHtml.split("<li>").filter(i => i !== "");
 };
 
 //pulls recipe data into db from peachworks
 const fetchRecipeFromPeachworks = (id, callback) => {
   peachworks.proxyGetInventory(id).then(invJson => {
-    let inventory = invJson.json.map(i => {
+    let inventory = invJson.map(i => {
       return {
-        //TODO: what is quantity vs common_quantity?
         quantity: parseFloat(i.quantity),
         itemId: i.item_id,
-        unitId: i.unit_id
+        unitId: i.unit_id,
+        customUnitId: i.each_unit_id
       };
     });
 
-    peachworks.proxyGetInstructions(id).then(insJson => {
-      const instructions = insJson.json.map(i => {
-        return {
-          content: i.content
-        };
-      });
+    const fetchForInv = (idKey, peachworksApi, invKey, jsonKey) => {
+      const ids = inventory.map(i => i[idKey]).filter(i => i);
 
-      const itemIds = inventory.map(i => i.itemId);
-      peachworks.proxyGetItems(itemIds).then(itemsJson => {
+      return peachworksApi(ids).then(json => {
         inventory = inventory.map(i => {
-          const item = itemsJson.json.find(item => i.itemId === item.id)
-          return Object.assign(i, {name: item.name});
+          if (i[idKey]) {
+            //TODO this is pretty gross... any better way to do this?
+            const jsonItem = json.find(j => i[idKey] === j.id);
+            i[invKey] = jsonItem[jsonKey];
+          }
+          return i;
         });
+      });
+    };
 
-        const unitIds = inventory.map(i => i.unitId);
-        peachworks.proxyGetUnits(unitIds).then(unitsJson => {
-          inventory = inventory.map(i => {
-            const unit = unitsJson.json.find(unit => i.unitId === unit.id)
-            return Object.assign(i, {unit: unit.abbr});
+    const promises = [
+      fetchForInv("itemId", peachworks.proxyGetItems, "name", "name"),
+      fetchForInv("unitId", peachworks.proxyGetUnits, "unit", "name"),
+      fetchForInv(
+        "customUnitId",
+        peachworks.proxyGetCustomUnits,
+        "customUnit",
+        "description"
+      )
+    ];
+
+    Promise.all(promises)
+      .catch(err => {
+        throw err;
+      })
+      .then(values => {
+        peachworks.proxyGetInstructions(id).then(insJson => {
+          const instructionsArray = insJson.map(i => extractContent(i.content));
+          //basically flatMap
+          const instructions = [].concat(...instructionsArray).map(i => {
+            return {
+              content: i
+            };
           });
 
           const recipe = {
@@ -113,7 +170,6 @@ const fetchRecipeFromPeachworks = (id, callback) => {
           createOrUpdate(recipe, callback);
         });
       });
-    });
   });
 };
 

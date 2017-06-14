@@ -22,21 +22,30 @@ class Recipe extends Component {
       instructions
     } = this.props.recipe;
 
+    const recStyle = {
+      margin: "20px"
+    };
+
     const ingStyle = {
-      margin: '10px 0'
-    }
+      margin: "10px 0"
+    };
+
+    const h1Style = {
+      fontWeight: "bold",
+      margin: "0 0 5px 0"
+    };
 
     return (
-      <div className="recipe" onLoad={() => onLoad(id)}>
-        <div>Name: {name}</div>
-        <div>Yield: {yieldAmount}</div>
+      <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
+        <h1 style={h1Style}>Name: {name}</h1>
+        <h1 style={h1Style}>Yield: {yieldAmount}</h1>
         <div>{description}</div>
         <div className="ingredients" style={ingStyle}>
-          <h1>Ingredients</h1>
+          <h1 style={h1Style}>Ingredients:</h1>
           {inventory && inventory.map(i => <Ingredient {...i} />)}
         </div>
         <div className="instructions">
-          <h1>Method of Prep</h1>
+          <h1 style={h1Style}>Method of Prep:</h1>
           {instructions && instructions.map(i => <Instruction {...i} />)}
         </div>
       </div>

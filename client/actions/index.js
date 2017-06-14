@@ -9,13 +9,16 @@ export const loadRecipes = () => {
   };
 };
 
-export const loadRecipe = id => {
+export const loadRecipe = (id, isMenuRecipe) => {
+  const urlPrefix = isMenuRecipe ? "/menu_recipe/" : "/prep_recipe/";
+
   return {
     type: "LOAD_RECIPE",
     id: id,
+    isMenuRecipe: isMenuRecipe,
     payload: {
       request: {
-        url: "/recipe/" + id
+        url: urlPrefix + id
       }
     }
   };

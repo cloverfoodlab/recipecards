@@ -26,7 +26,7 @@ render(
     <Router>
       <div>
         <Route exact path="/" component={RecipesList} />
-        <Route path="/recipe/(\d+)" component={Recipe} />
+        <Route path="/(\S+)_recipe/(\d+)" component={Recipe} />
       </div>
     </Router>
   </Provider>,

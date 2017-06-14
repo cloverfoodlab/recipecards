@@ -13,7 +13,11 @@ const recipes = (state = defaultState, action) => {
       //TODO: process pages beyond the first one
       const recipesJson = action.payload.data.recipes;
       const recipeList = recipesJson.map(recipe => {
-        return { name: recipe.name, id: recipe.id };
+        return {
+          name: recipe.name,
+          id: recipe.id,
+          isMenuRecipe: recipe.isMenuRecipe
+        };
       });
       return { ...state, recipeList: recipeList };
 

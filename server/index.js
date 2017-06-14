@@ -12,8 +12,12 @@ app.get("/api/recipes", (req, res) => {
   db.getRecipes(req, res);
 });
 
-app.get("/api/recipe/:id", (req, res) => {
-  db.getRecipe(req, res);
+app.get("/api/menu_recipe/:id", (req, res) => {
+  db.getRecipe(req, res, true);
+});
+
+app.get("/api/prep_recipe/:id", (req, res) => {
+  db.getRecipe(req, res, false);
 });
 
 if (process.env.NODE_ENV !== "production") {
@@ -38,7 +42,12 @@ app.get("/", (req, res) => {
   res.sendFile(indexPath);
 });
 
-app.get("/recipe/:id", (req, res) => {
+app.get("/menu_recipe/:id", (req, res) => {
+  let indexPath = path.resolve(__dirname, "../index.html");
+  res.sendFile(indexPath);
+});
+
+app.get("/prep_recipe/:id", (req, res) => {
   let indexPath = path.resolve(__dirname, "../index.html");
   res.sendFile(indexPath);
 });

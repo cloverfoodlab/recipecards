@@ -9,7 +9,7 @@ import Instruction from "../components/Instruction";
 class Recipe extends Component {
   constructor(props) {
     super();
-    props.onLoad(props.recipe.id);
+    props.onLoad(props.recipe.id, props.recipe.isMenuRecipe);
   }
 
   render() {
@@ -19,7 +19,8 @@ class Recipe extends Component {
       yieldAmount,
       description,
       inventory,
-      instructions
+      instructions,
+      isMenuRecipe
     } = this.props.recipe;
 
     const recStyle = {
@@ -32,14 +33,14 @@ class Recipe extends Component {
 
     const h1Style = {
       fontWeight: "bold",
-      margin: "0 0 5px 0"
+      margin: "0 0 5px 0",
+      display: "block"
     };
 
     return (
       <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
         <h1 style={h1Style}>Name: {name}</h1>
-        <h1 style={h1Style}>Yield: {yieldAmount}</h1>
-        <div>{description}</div>
+        <div>{description ? "Yield: " + description : ""}</div>
         <div className="ingredients" style={ingStyle}>
           <h1 style={h1Style}>Ingredients:</h1>
           {inventory && inventory.map(i => <Ingredient {...i} />)}
@@ -60,21 +61,27 @@ Recipe.propTypes = {
   description: PropTypes.string,
   ingredients: PropTypes.array,
   instructions: PropTypes.array,
+  isMenuRecipe: PropTypes.bool,
   onLoad: PropTypes.func
   //TODO: subrecipes how organize
 };
 
 const mapStateToProps = (state, ownProps) => {
-  const urlId = parseInt(ownProps.match.params[0], 10);
+  const isMenuRecipe = ownProps.match.params[0] === "menu";
+  const urlId = parseInt(ownProps.match.params[1], 10);
+
   return {
-    recipe: state.recipes.find(recipe => recipe.id === urlId) || { id: urlId }
+    recipe: state.recipes.find(recipe => recipe.id === urlId) || {
+      id: urlId,
+      isMenuRecipe: isMenuRecipe
+    }
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onLoad: id => {
-      dispatch(loadRecipe(id));
+    onLoad: (id, isMenuRecipe) => {
+      dispatch(loadRecipe(id, isMenuRecipe));
     }
   };
 };

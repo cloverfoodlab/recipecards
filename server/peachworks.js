@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const queryString = require("query-string");
 
 // for every URL path that starts with /api/, send request to upstream API service
-const peachworksApiUrl = (url, otherQueries = {}, page = 1, limit = 100) => {
+const peachworksApiUrl = (url, otherQueries = {}, page = 1, limit = 1000) => {
   const peachworksAccountId = process.env.PEACHWORKS_ACCOUNT_ID;
   const peachworksAccessToken = process.env.PEACHWORKS_ACCESS_TOKEN;
 
@@ -53,8 +53,13 @@ const fetchAndRespond = apiUrl => {
   });
 };
 
-const proxyGetRecipes = (page = 1) => {
+const proxyGetMenuRecipes = (page = 1) => {
   const apiUrl = peachworksApiUrl("wtm_recipes", {}, page);
+  return fetchAndRespond(apiUrl);
+};
+
+const proxyGetPrepRecipes = (page = 1) => {
+  const apiUrl = peachworksApiUrl("wtm_inv_prep_recipes", {}, page);
   return fetchAndRespond(apiUrl);
 };
 
@@ -63,6 +68,13 @@ const proxyGetRecipes = (page = 1) => {
 const proxyGetInventory = id => {
   const otherQueries = { find: '{"recipe_id":' + id + "}" };
   const apiUrl = peachworksApiUrl("wtm_recipe_items", otherQueries);
+  return fetchAndRespond(apiUrl);
+};
+
+//wtm_inv_prep_recipe_items?access_token=<token>~&find={"inv_prep_recipe_id":<id>}
+const proxyGetPrepInventory = id => {
+  const otherQueries = { find: '{"inv_prep_recipe_id":' + id + "}" };
+  const apiUrl = peachworksApiUrl("wtm_inv_prep_recipe_items", otherQueries);
   return fetchAndRespond(apiUrl);
 };
 
@@ -100,8 +112,10 @@ const proxyGetCustomUnits = ids => {
 };
 
 module.exports = {
-  proxyGetRecipes: proxyGetRecipes,
+  proxyGetMenuRecipes: proxyGetMenuRecipes,
+  proxyGetPrepRecipes: proxyGetPrepRecipes,
   proxyGetInventory: proxyGetInventory,
+  proxyGetPrepInventory: proxyGetPrepInventory,
   proxyGetInstructions: proxyGetInstructions,
   proxyGetItems: proxyGetItems,
   proxyGetUnits: proxyGetUnits,

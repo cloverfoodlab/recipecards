@@ -1,15 +1,17 @@
 import "babel-polyfill";
 import React, { Component, PropTypes } from "react";
 import { connect } from "react-redux";
+import Spinner from "react-spinkit";
 
 import { loadRecipe } from "../actions";
 import Ingredient from "../components/Ingredient";
 import Instruction from "../components/Instruction";
+import "../../css/recipe.css";
 
 class Recipe extends Component {
   constructor(props) {
     super();
-    props.onLoad(props.recipe.id);
+    props.onLoad(props.recipe.id, props.recipe.isMenuRecipe);
   }
 
   render() {
@@ -19,11 +21,16 @@ class Recipe extends Component {
       yieldAmount,
       description,
       inventory,
-      instructions
+      instructions,
+      isMenuRecipe,
+      loaded
     } = this.props.recipe;
 
     const recStyle = {
-      margin: "20px"
+      margin: "30px",
+      height: "100%",
+      fontSize: "20px",
+      overflow: "scroll"
     };
 
     const ingStyle = {
@@ -32,24 +39,29 @@ class Recipe extends Component {
 
     const h1Style = {
       fontWeight: "bold",
-      margin: "0 0 5px 0"
+      margin: "0 0 5px 0",
+      display: "block"
     };
 
-    return (
-      <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
-        <h1 style={h1Style}>Name: {name}</h1>
-        <h1 style={h1Style}>Yield: {yieldAmount}</h1>
-        <div>{description}</div>
-        <div className="ingredients" style={ingStyle}>
-          <h1 style={h1Style}>Ingredients:</h1>
-          {inventory && inventory.map(i => <Ingredient {...i} />)}
+    if (loaded) {
+      //TODO: is there a better way that doesn't involve duplicating the whole thing?
+      return (
+        <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
+          <h1 style={h1Style}>Name: {name}</h1>
+          <div>{description ? "Yield: " + description : ""}</div>
+          <div className="ingredients" style={ingStyle}>
+            <h1 style={h1Style}>Ingredients:</h1>
+            {inventory && inventory.map(i => <Ingredient {...i} />)}
+          </div>
+          <div className="instructions">
+            <h1 style={h1Style}>Method of Prep:</h1>
+            {instructions && instructions.map(i => <Instruction {...i} />)}
+          </div>
         </div>
-        <div className="instructions">
-          <h1 style={h1Style}>Method of Prep:</h1>
-          {instructions && instructions.map(i => <Instruction {...i} />)}
-        </div>
-      </div>
-    );
+      );
+    } else {
+      return <Spinner name="spinner" />;
+    }
   }
 }
 
@@ -60,21 +72,33 @@ Recipe.propTypes = {
   description: PropTypes.string,
   ingredients: PropTypes.array,
   instructions: PropTypes.array,
-  onLoad: PropTypes.func
-  //TODO: subrecipes how organize
+  isMenuRecipe: PropTypes.bool,
+  onLoad: PropTypes.func,
+  loaded: PropTypes.bool
+};
+
+//TODO: don't dupe from reducers
+const keyId = (id, isMenuRecipe) => {
+  return isMenuRecipe ? "menu" + id : "prep" + id;
 };
 
 const mapStateToProps = (state, ownProps) => {
-  const urlId = parseInt(ownProps.match.params[0], 10);
+  const isMenuRecipe = ownProps.match.params[0] === "menu";
+  const urlId = parseInt(ownProps.match.params[1], 10);
+
   return {
-    recipe: state.recipes.find(recipe => recipe.id === urlId) || { id: urlId }
+    recipe: state.recipes[keyId(urlId, isMenuRecipe)] || {
+      id: urlId,
+      isMenuRecipe: isMenuRecipe,
+      loaded: false
+    }
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onLoad: id => {
-      dispatch(loadRecipe(id));
+    onLoad: (id, isMenuRecipe) => {
+      dispatch(loadRecipe(id, isMenuRecipe));
     }
   };
 };

@@ -23,3 +23,10 @@ export const loadRecipe = (id, isMenuRecipe) => {
     }
   };
 };
+
+export const filterRecipes = str => {
+  return {
+    type: "FILTER_RECIPES",
+    prefix: str
+  };
+};

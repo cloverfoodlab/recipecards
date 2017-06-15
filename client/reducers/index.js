@@ -1,6 +1,7 @@
 const defaultState = {
   recipeList: [],
-  recipes: {}
+  recipes: {},
+  filter: ""
 };
 
 const keyId = (id, isMenuRecipe) => {
@@ -11,8 +12,18 @@ let newState = {};
 
 const recipes = (state = defaultState, action) => {
   switch (action.type) {
+    case "FILTER_RECIPES":
+      return {
+        ...state,
+        filter: action.prefix
+      };
+
     case "LOAD_RECIPES":
-      return state;
+      //anytime we load something new, clear the filter
+      return {
+        ...state,
+        filter: ""
+      };
 
     case "LOAD_RECIPES_SUCCESS":
       //TODO: process pages beyond the first one
@@ -40,6 +51,8 @@ const recipes = (state = defaultState, action) => {
         };
       }
 
+      //anytime we load something new, clear the filter
+      newState.filter = "";
       return newState;
 
     default:

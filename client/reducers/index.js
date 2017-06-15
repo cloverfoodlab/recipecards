@@ -7,10 +7,11 @@ const keyId = (id, isMenuRecipe) => {
   return isMenuRecipe ? "menu" + id : "prep" + id;
 };
 
+let newState = {};
+
 const recipes = (state = defaultState, action) => {
   switch (action.type) {
     case "LOAD_RECIPES":
-      console.log("loading recipes");
       return state;
 
     case "LOAD_RECIPES_SUCCESS":
@@ -30,22 +31,25 @@ const recipes = (state = defaultState, action) => {
       return state;
 
     case "LOAD_RECIPE":
-      if (!state.recipes[keyId(action.id, action.isMenuRecipe)]) {
-        state.recipes[keyId(action.id, action.isMenuRecipe)] = {
+      newState = Object.assign({}, state);
+      if (!newState.recipes[keyId(action.id, action.isMenuRecipe)]) {
+        newState.recipes[keyId(action.id, action.isMenuRecipe)] = {
           id: action.id,
           isMenuRecipe: action.isMenuRecipe,
           loaded: false
         };
       }
 
-      return state;
+      return newState;
 
     default:
-      Object.keys(state.recipes).forEach(key => {
-        state.recipes[key] = recipe(state.recipes[key], action);
+      newState = Object.assign({}, state);
+
+      Object.keys(newState.recipes).forEach(key => {
+        newState.recipes[key] = recipe(newState.recipes[key], action);
       });
 
-      return state;
+      return newState;
   }
 };
 

@@ -1,0 +1,6 @@
+@media print {
+  .recipe {
+    column-count: 2;
+    margin: 0;
+  }
+}

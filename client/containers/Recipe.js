@@ -2,11 +2,11 @@ import "babel-polyfill";
 import React, { Component, PropTypes } from "react";
 import { connect } from "react-redux";
 import Spinner from "react-spinkit";
-import MediaQuery from "react-responsive";
 
 import { loadRecipe } from "../actions";
 import Ingredient from "../components/Ingredient";
 import Instruction from "../components/Instruction";
+import "../../css/recipe.css";
 
 class Recipe extends Component {
   constructor(props) {
@@ -33,11 +33,6 @@ class Recipe extends Component {
       overflow: "scroll"
     };
 
-    const printStyle = {
-      columnCount: 2,
-      margin: "0"
-    };
-
     const ingStyle = {
       margin: "10px 0"
     };
@@ -51,35 +46,17 @@ class Recipe extends Component {
     if (loaded) {
       //TODO: is there a better way that doesn't involve duplicating the whole thing?
       return (
-        <div>
-          <MediaQuery print>
-            <div style={{ ...recStyle, ...printStyle }} className="recipe">
-              <h1 style={h1Style}>Name: {name}</h1>
-              <div>{description ? "Yield: " + description : ""}</div>
-              <div className="ingredients" style={ingStyle}>
-                <h1 style={h1Style}>Ingredients:</h1>
-                {inventory && inventory.map(i => <Ingredient {...i} />)}
-              </div>
-              <div className="instructions">
-                <h1 style={h1Style}>Method of Prep:</h1>
-                {instructions && instructions.map(i => <Instruction {...i} />)}
-              </div>
-            </div>
-          </MediaQuery>
-          <MediaQuery screen>
-            <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
-              <h1 style={h1Style}>Name: {name}</h1>
-              <div>{description ? "Yield: " + description : ""}</div>
-              <div className="ingredients" style={ingStyle}>
-                <h1 style={h1Style}>Ingredients:</h1>
-                {inventory && inventory.map(i => <Ingredient {...i} />)}
-              </div>
-              <div className="instructions">
-                <h1 style={h1Style}>Method of Prep:</h1>
-                {instructions && instructions.map(i => <Instruction {...i} />)}
-              </div>
-            </div>
-          </MediaQuery>
+        <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
+          <h1 style={h1Style}>Name: {name}</h1>
+          <div>{description ? "Yield: " + description : ""}</div>
+          <div className="ingredients" style={ingStyle}>
+            <h1 style={h1Style}>Ingredients:</h1>
+            {inventory && inventory.map(i => <Ingredient {...i} />)}
+          </div>
+          <div className="instructions">
+            <h1 style={h1Style}>Method of Prep:</h1>
+            {instructions && instructions.map(i => <Instruction {...i} />)}
+          </div>
         </div>
       );
     } else {
@@ -109,7 +86,6 @@ const mapStateToProps = (state, ownProps) => {
   const isMenuRecipe = ownProps.match.params[0] === "menu";
   const urlId = parseInt(ownProps.match.params[1], 10);
 
-  console.log(state);
   return {
     recipe: state.recipes[keyId(urlId, isMenuRecipe)] || {
       id: urlId,

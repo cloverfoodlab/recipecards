@@ -22,12 +22,16 @@
     ]
   },
   "now": {
-    "alias": "recipes",
+    "alias": ["recipes", "clover.recipes"],
+    "engines": {
+      "node": "^8.0.0"
+    },
     "env": {
       "PEACHWORKS_ACCOUNT_ID": "@peachworks-account-id",
       "PEACHWORKS_ACCESS_TOKEN": "@peachworks-access-token",
       "NODE_ENV": "production"
-    }
+    },
+    "public": true
   },
   "repository": {
     "type": "git",

@@ -6,7 +6,7 @@ import { render } from "react-dom";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import thunk from "redux-thunk";
-import { createStore, applyMiddleware } from "redux";
+import { createStore, applyMiddleware, compose } from "redux";
 
 import recipes from "./reducers";
 import Recipe from "./containers/Recipe";

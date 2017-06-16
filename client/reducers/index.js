@@ -15,7 +15,7 @@ const recipes = (state = defaultState, action) => {
     case "FILTER_RECIPES":
       return {
         ...state,
-        filter: action.prefix
+        filter: action.str
       };
 
     case "LOAD_RECIPES":

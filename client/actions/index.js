@@ -14,8 +14,8 @@ export const loadRecipe = (id, isMenuRecipe) => {
 
   return {
     type: "LOAD_RECIPE",
-    id: id,
-    isMenuRecipe: isMenuRecipe,
+    id,
+    isMenuRecipe,
     payload: {
       request: {
         url: urlPrefix + id
@@ -27,6 +27,6 @@ export const loadRecipe = (id, isMenuRecipe) => {
 export const filterRecipes = str => {
   return {
     type: "FILTER_RECIPES",
-    prefix: str
+    str
   };
 };

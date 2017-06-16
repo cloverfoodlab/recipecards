@@ -1,12 +1,15 @@
 const express = require("express");
 const app = express();
-const peachworks = require("./peachworks");
-const dbController = require("./dbController");
+const path = require("path");
 const webpack = require("webpack");
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpackHotMiddleware = require("webpack-hot-middleware");
 const config = require("../webpack.config.dev");
-const path = require("path");
+const peachworks = require("./peachworks");
+const dbController = require("./dbController");
+const cron = require("./cron");
+
+cron.scheduleJobs();
 
 app.get("/api/recipes", (req, res) => {
   dbController.getRecipes(req, res);

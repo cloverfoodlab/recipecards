@@ -29,6 +29,14 @@ const getPrepRecipes = () => {
   });
 };
 
+const getMenuRecipes = () => {
+  return db.allDocs({
+    startkey: "recipe-menu-",
+    endkey: "recipe-menu-\uffff",
+    include_docs: true
+  });
+};
+
 const getRecipe = (isMenuRecipe, id) => {
   const _id = dbId(isMenuRecipe, id);
 
@@ -62,6 +70,7 @@ const upsertRecipe = (recipe, callback) => {
 module.exports = {
   getAllRecipes,
   getPrepRecipes,
+  getMenuRecipes,
   getRecipe,
   upsertRecipe,
   bulkUpdate

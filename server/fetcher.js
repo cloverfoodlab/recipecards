@@ -5,6 +5,8 @@ const db = require("./db");
  * FETCH DATA INTO DB FROM PEACHWORKS
  */
 
+const noop = () => {};
+
 //pulls recipes data into db from peachworks
 const populateRecipes = (peachworksApi, isMenuRecipe, callback, page = 1) => {
   peachworksApi(page).then(recipes => {
@@ -15,7 +17,6 @@ const populateRecipes = (peachworksApi, isMenuRecipe, callback, page = 1) => {
       });
     });
 
-    const noop = () => {};
     const promises = idRecipes.map(recipe => db.upsertRecipe(recipe, noop));
 
     Promise.all(promises)

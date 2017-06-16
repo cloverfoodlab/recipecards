@@ -66,6 +66,7 @@
     "express": "^4.15.3",
     "node-fetch": "^1.7.1",
     "node-sass": "^4.5.3",
+    "node-schedule": "^1.2.3",
     "pouchdb": "^6.2.0",
     "pouchdb-adapter-memory": "^6.2.0",
     "pouchdb-upsert": "^2.2.0",

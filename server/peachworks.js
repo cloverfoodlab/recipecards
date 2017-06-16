@@ -1,6 +1,10 @@
 const fetch = require("node-fetch");
 const queryString = require("query-string");
 
+/*
+ * FETCH FROM PEACHWORKS API AND RETURN JSON RESULTS
+ */
+
 // for every URL path that starts with /api/, send request to upstream API service
 const peachworksApiUrl = (url, otherQueries = {}, page = 1, limit = 1000) => {
   const peachworksAccountId = process.env.PEACHWORKS_ACCOUNT_ID;
@@ -112,12 +116,12 @@ const proxyGetCustomUnits = ids => {
 };
 
 module.exports = {
-  proxyGetMenuRecipes: proxyGetMenuRecipes,
-  proxyGetPrepRecipes: proxyGetPrepRecipes,
-  proxyGetInventory: proxyGetInventory,
-  proxyGetPrepInventory: proxyGetPrepInventory,
-  proxyGetInstructions: proxyGetInstructions,
-  proxyGetItems: proxyGetItems,
-  proxyGetUnits: proxyGetUnits,
-  proxyGetCustomUnits: proxyGetCustomUnits
+  proxyGetMenuRecipes,
+  proxyGetPrepRecipes,
+  proxyGetInventory,
+  proxyGetPrepInventory,
+  proxyGetInstructions,
+  proxyGetItems,
+  proxyGetUnits,
+  proxyGetCustomUnits
 };

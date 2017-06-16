@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const peachworks = require("./peachworks");
-const db = require("./db");
+const dbController = require("./dbController");
 const webpack = require("webpack");
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpackHotMiddleware = require("webpack-hot-middleware");
@@ -9,15 +9,15 @@ const config = require("../webpack.config.dev");
 const path = require("path");
 
 app.get("/api/recipes", (req, res) => {
-  db.getRecipes(req, res);
+  dbController.getRecipes(req, res);
 });
 
 app.get("/api/menu_recipe/:id", (req, res) => {
-  db.getRecipe(req, res, true);
+  dbController.getRecipe(req, res, true);
 });
 
 app.get("/api/prep_recipe/:id", (req, res) => {
-  db.getRecipe(req, res, false);
+  dbController.getRecipe(req, res, false);
 });
 
 if (process.env.NODE_ENV !== "production") {

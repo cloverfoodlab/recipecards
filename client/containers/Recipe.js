@@ -14,6 +14,13 @@ class Recipe extends Component {
     props.onLoad(props.recipe.id, props.recipe.isMenuRecipe);
   }
 
+  //if a recipe links to another, it doesn't remount, just receives new props
+  componentWillReceiveProps(props) {
+    if (this.props.recipe.id !== props.recipe.id) {
+      props.onLoad(props.recipe.id, props.recipe.isMenuRecipe);
+    }
+  }
+
   render() {
     const {
       id,
@@ -46,7 +53,7 @@ class Recipe extends Component {
     if (loaded) {
       //TODO: is there a better way that doesn't involve duplicating the whole thing?
       return (
-        <div style={recStyle} className="recipe" onLoad={() => onLoad(id)}>
+        <div style={recStyle} className="recipe">
           <h1 style={h1Style}>Name: {name}</h1>
           <div>{description ? "Yield: " + description : ""}</div>
           <div className="ingredients" style={ingStyle}>

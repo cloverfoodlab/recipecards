@@ -1,5 +1,6 @@
 import "babel-polyfill";
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
 import { connect } from "react-redux";
 import Spinner from "react-spinkit";
 
@@ -58,11 +59,13 @@ class Recipe extends Component {
           <div>{description ? "Yield: " + description : ""}</div>
           <div className="ingredients" style={ingStyle}>
             <h1 style={h1Style}>Ingredients:</h1>
-            {inventory && inventory.map(i => <Ingredient {...i} />)}
+            {inventory &&
+              inventory.map(i => <Ingredient key={i.position} {...i} />)}
           </div>
           <div className="instructions">
             <h1 style={h1Style}>Method of Prep:</h1>
-            {instructions && instructions.map(i => <Instruction {...i} />)}
+            {instructions &&
+              instructions.map(i => <Instruction key={i.id} {...i} />)}
           </div>
         </div>
       );
@@ -73,15 +76,8 @@ class Recipe extends Component {
 }
 
 Recipe.propTypes = {
-  id: PropTypes.number,
-  name: PropTypes.string,
-  yieldAmount: PropTypes.number,
-  description: PropTypes.string,
-  ingredients: PropTypes.array,
-  instructions: PropTypes.array,
-  isMenuRecipe: PropTypes.bool,
-  onLoad: PropTypes.func,
-  loaded: PropTypes.bool
+  recipe: PropTypes.object.isRequired,
+  onLoad: PropTypes.func.isRequired
 };
 
 //TODO: don't dupe from reducers

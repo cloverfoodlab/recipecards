@@ -135,7 +135,8 @@ const fetchPrepRecipesFromPeachworks = (callback, page = 1) => {
             //prep API has instructions at the recipe level... hooray for inconsistencies!
             const instructions = [
               {
-                content: row.doc.instructions
+                content: row.doc.instructions,
+                id: row.doc.id
               }
             ];
 
@@ -190,6 +191,7 @@ const fetchRecipeFromPeachworks = (id, isMenuRecipe, callback) => {
     let inventory = invJson.map(i => {
       return {
         quantity: parseFloat(i.quantity),
+        position: i.position,
         itemId: i[itemIdKey],
         unitId: i.unit_id,
         customUnitId: i.each_unit_id
@@ -255,7 +257,8 @@ const fetchRecipeFromPeachworks = (id, isMenuRecipe, callback) => {
               peachworks.proxyGetInstructions(id).then(insJson => {
                 const instructions = insJson.map(i => {
                   return {
-                    content: i.content
+                    content: i.content,
+                    id: i.id
                   };
                 });
 

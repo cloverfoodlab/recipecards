@@ -71,9 +71,9 @@ const proxyGetInventory = id => {
   return fetchAndRespond(apiUrl);
 };
 
-//wtm_inv_prep_recipe_items?access_token=<token>~&find={"inv_item_id":<id>}
+//wtm_inv_prep_recipe_items?access_token=<token>~&find={"inv_prep_recipe_id":<id>}
 const proxyGetPrepInventory = id => {
-  const otherQueries = { find: '{"inv_item_id":' + id + "}" };
+  const otherQueries = { find: '{"inv_prep_recipe_id":' + id + "}" };
   const apiUrl = peachworksApiUrl("wtm_inv_prep_recipe_items", otherQueries);
   return fetchAndRespond(apiUrl);
 };

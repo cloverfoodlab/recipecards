@@ -6,7 +6,7 @@ import Spinner from "react-spinkit";
 import { loadRecipe } from "../actions";
 import Ingredient from "../components/Ingredient";
 import Instruction from "../components/Instruction";
-import "../../css/recipe.css";
+import "../../css/recipe.scss";
 
 class Recipe extends Component {
   constructor(props) {

@@ -8,7 +8,7 @@ const Ingredient = ({
   unit,
   name,
   customUnit,
-  isPrepRecipe
+  prepRecipeId
 }) => {
   const style = {
     margin: "3px 0"
@@ -21,8 +21,8 @@ const Ingredient = ({
     margin: "0 0 0 5px"
   };
 
-  const nameLink = isPrepRecipe
-    ? <Link style={{ color: "black" }} to={"/prep_recipe/" + itemId}>
+  const nameLink = prepRecipeId
+    ? <Link style={{ color: "black" }} to={"/prep_recipe/" + prepRecipeId}>
         {name}
       </Link>
     : name;
@@ -42,7 +42,7 @@ Ingredient.propTypes = {
   unit: PropTypes.string,
   name: PropTypes.string,
   customUnit: PropTypes.string,
-  isPrepRecipe: PropTypes.bool
+  prepRecipeId: PropTypes.number
 };
 
 export default Ingredient;

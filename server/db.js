@@ -79,40 +79,19 @@ const createOrUpdate = (newDoc, callback) => {
     });
 };
 
-/*
- peachworks returns a terrible interface for instructions content,
- something along the lines of:
-
- "<p><ol><li>INSTRUCTION 1<br></li><li>INSTRUCTION 2<br></li></ol></p>"
-
- we want to convert this to ["INSTRUCTION 1", "INSTRUCTION 2"]
- */
-const extractContent = html => {
-  const newHtml = html
-    .replace(/<br>/gi, "")
-    .replace(/<\/p>/gi, "")
-    .replace(/<p>/gi, "")
-    .replace(/<ol>/gi, "")
-    .replace(/<\/ol>/gi, "")
-    .replace(/<\/li>/gi, "");
-
-  return newHtml.split("<li>").filter(i => i !== "");
-};
-
 //pulls recipes data into db from peachworks
 const fetchRecipesFromPeachworks = (
   peachworksApi,
-  idKey,
   isMenuRecipe,
   callback,
   page = 1
 ) => {
   peachworksApi(page).then(recipes => {
     const idRecipes = recipes.map(recipe => {
-      const _id = dbId(isMenuRecipe, recipe[idKey]);
+      const _id = dbId(isMenuRecipe, recipe.id);
       return Object.assign({}, recipe, {
         _id: _id,
-        id: recipe[idKey],
+        id: recipe.id,
         isMenuRecipe: isMenuRecipe
       });
     });
@@ -131,7 +110,6 @@ const fetchRecipesFromPeachworks = (
         } else {
           fetchRecipesFromPeachworks(
             peachworksApi,
-            idKey,
             isMenuRecipe,
             callback,
             page + 1
@@ -144,8 +122,6 @@ const fetchRecipesFromPeachworks = (
 const fetchPrepRecipesFromPeachworks = (callback, page = 1) => {
   fetchRecipesFromPeachworks(
     peachworks.proxyGetPrepRecipes,
-    //store in our db based off of inv_item_id
-    "inv_item_id",
     false,
     () => {
       db
@@ -156,23 +132,12 @@ const fetchPrepRecipesFromPeachworks = (callback, page = 1) => {
         })
         .then(result => {
           let prepRecipes = result.rows.map(row => {
-            //already an array of objects
-            if (
-              row.doc.instructions &&
-              typeof row.doc.instructions !== "string"
-            ) {
-              //we still want to store the prep recipe's id though
-              return Object.assign({}, row.doc, { prepId: row.doc.id });
-            }
-
             //prep API has instructions at the recipe level... hooray for inconsistencies!
-            const instructions = extractContent(
-              row.doc.instructions || ""
-            ).map(i => {
-              return {
-                content: i
-              };
-            });
+            const instructions = [
+              {
+                content: row.doc.instructions
+              }
+            ];
 
             return Object.assign({}, row.doc, {
               instructions: instructions,
@@ -181,12 +146,12 @@ const fetchPrepRecipesFromPeachworks = (callback, page = 1) => {
           });
 
           //name not included, so we gotta get those from the inv items
-          const invIds = prepRecipes.map(recipe => recipe.id);
+          const invIds = prepRecipes.map(recipe => recipe.inv_item_id);
           peachworks.proxyGetItems(invIds).then(json => {
             const jsonMap = new Map(json.map(j => [j.id, j]));
 
             prepRecipes = prepRecipes.map(recipe => {
-              const invItem = jsonMap.get(recipe.id);
+              const invItem = jsonMap.get(recipe.inv_item_id);
               if (invItem) {
                 return Object.assign({}, recipe, { name: invItem.name });
               } else {
@@ -208,7 +173,6 @@ const fetchPrepRecipesFromPeachworks = (callback, page = 1) => {
 const fetchMenuRecipesFromPeachworks = (callback, page = 1) => {
   fetchRecipesFromPeachworks(
     peachworks.proxyGetMenuRecipes,
-    "id",
     true,
     callback,
     page
@@ -232,90 +196,88 @@ const fetchRecipeFromPeachworks = (id, isMenuRecipe, callback) => {
       };
     });
 
-    const fetchForInv = (idKey, peachworksApi, invKey, jsonKey) => {
-      const ids = inventory.map(i => i[idKey]).filter(i => i);
-
-      return peachworksApi(ids).then(json => {
-        const jsonMap = new Map(json.map(j => [j.id, j]));
-
-        inventory = inventory.map(i => {
-          if (i[idKey]) {
-            const jsonItem = jsonMap.get(i[idKey]);
-            //TODO this is pretty gross... any better way to do this? can't do assign since key is dynamic?
-            i[invKey] = jsonItem[jsonKey];
-          }
-          return i;
-        });
-      });
-    };
-
-    const promises = [
-      fetchForInv("itemId", peachworks.proxyGetItems, "name", "name"),
-      fetchForInv("unitId", peachworks.proxyGetUnits, "unit", "name"),
-      fetchForInv(
-        "customUnitId",
-        peachworks.proxyGetCustomUnits,
-        "customUnit",
-        "description"
-      )
-    ];
-
-    Promise.all(promises)
-      .catch(err => {
-        throw err;
+    //see if any of these are prep recipes
+    //TODO: might make sense to go relational because of this... otherwise we have to fetch all preps every time, since we need to match against their inv_item_id
+    const invDbKeys = inventory.map(i => dbId(false, i.itemId));
+    db
+      .allDocs({
+        startkey: "recipe-prep-",
+        endkey: "recipe-prep-\uffff",
+        include_docs: true
       })
-      .then(values => {
-        if (isMenuRecipe) {
-          peachworks.proxyGetInstructions(id).then(insJson => {
-            const instructionsArray = insJson.map(i =>
-              extractContent(i.content)
-            );
-            //basically flatMap
-            const instructions = [].concat(...instructionsArray).map(i => {
-              return {
-                content: i
-              };
-            });
+      .then(results => {
+        inventory = inventory.map(i => {
+          const prepRecipe = results.rows.find(
+            row => row.doc && row.doc.inv_item_id === i.itemId
+          );
 
-            //see if any of these are prep recipes
-            //TODO: can prep recipes also have prep recipes in the ingredients?
-            //TODO: might make sense to go relational because of this
-            const invDbKeys = inventory.map(i => dbId(false, i.itemId));
-            db
-              .allDocs({
-                keys: invDbKeys,
-                include_docs: true
-              })
-              .then(results => {
-                const invWithPrepLinks = inventory.map(i => {
-                  if (
-                    results.rows.find(row => row.doc && row.doc.id === i.itemId)
-                  ) {
-                    return Object.assign({}, i, { isPrepRecipe: true });
-                  } else {
-                    return Object.assign({}, i, { isPrepRecipe: false });
-                  }
+          if (prepRecipe) {
+            return Object.assign({}, i, { prepRecipeId: prepRecipe.doc.id });
+          } else {
+            return i;
+          }
+        });
+
+        const fetchForInv = (idKey, peachworksApi, invKey, jsonKey) => {
+          const ids = inventory.map(i => i[idKey]).filter(i => i);
+
+          return peachworksApi(ids).then(json => {
+            const jsonMap = new Map(json.map(j => [j.id, j]));
+
+            inventory = inventory.map(i => {
+              if (i[idKey]) {
+                const jsonItem = jsonMap.get(i[idKey]);
+                //TODO this is pretty gross... any better way to do this? can't do assign since key is dynamic?
+                i[invKey] = jsonItem[jsonKey];
+              }
+              return i;
+            });
+          });
+        };
+
+        const promises = [
+          fetchForInv("itemId", peachworks.proxyGetItems, "name", "name"),
+          fetchForInv("unitId", peachworks.proxyGetUnits, "unit", "name"),
+          fetchForInv(
+            "customUnitId",
+            peachworks.proxyGetCustomUnits,
+            "customUnit",
+            "description"
+          )
+        ];
+
+        Promise.all(promises)
+          .catch(err => {
+            throw err;
+          })
+          .then(values => {
+            if (isMenuRecipe) {
+              peachworks.proxyGetInstructions(id).then(insJson => {
+                const instructions = insJson.map(i => {
+                  return {
+                    content: i.content
+                  };
                 });
 
                 const recipe = {
                   _id: dbId(isMenuRecipe, id),
                   id: id,
-                  inventory: invWithPrepLinks,
+                  inventory: inventory,
                   instructions: instructions
                 };
 
                 createOrUpdate(recipe, callback);
               });
-          });
-        } else {
-          const recipe = {
-            _id: dbId(isMenuRecipe, id),
-            id: id,
-            inventory: inventory
-          };
+            } else {
+              const recipe = {
+                _id: dbId(isMenuRecipe, id),
+                id: id,
+                inventory: inventory
+              };
 
-          createOrUpdate(recipe, callback);
-        }
+              createOrUpdate(recipe, callback);
+            }
+          });
       });
   });
 };

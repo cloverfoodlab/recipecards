@@ -1,0 +1,32 @@
+@media print {
+  .recipe {
+    column-count: 2;
+    margin: 0;
+  }
+}
+
+.instruction {
+  /* removing terrible things from peachworks*/
+  .Apple-tab-span {
+    display: none;
+  }
+
+  /* removing terrible things from peachworks*/
+  br {
+    display: none;
+  }
+
+  /* TODO: why doesn't this work? even with !important... and why is there a dot in front of things in print? */
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul {
+    list-style-type: circle;
+  }
+
+  li {
+    margin: 8px 0;
+  }
+
+}

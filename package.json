@@ -65,9 +65,11 @@
     "css-loader": "^0.28.4",
     "express": "^4.15.3",
     "node-fetch": "^1.7.1",
+    "node-sass": "^4.5.3",
     "pouchdb": "^6.2.0",
     "pouchdb-adapter-memory": "^6.2.0",
     "pouchdb-upsert": "^2.2.0",
+    "prop-types": "^15.5.10",
     "query-string": "^4.3.4",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
@@ -78,7 +80,8 @@
     "redux-axios-middleware": "^4.0.0",
     "redux-thunk": "^2.2.0",
     "relational-pouch": "^1.4.5",
+    "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
-    "webpack": "^1.12.11"
+    "webpack": "^2.6.1"
   }
 }

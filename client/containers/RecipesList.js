@@ -1,5 +1,6 @@
 import "babel-polyfill";
-import React, { Component, PropTypes } from "react";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
 import { connect } from "react-redux";
 import Spinner from "react-spinkit";
 
@@ -42,11 +43,15 @@ class RecipesList extends Component {
           />
           <div className="menu-recipes">
             <h1 style={h1Style}>Menu Recipes</h1>
-            {menuRecipes.map(recipe => <RecipeLink {...recipe} />)}
+            {menuRecipes.map(recipe =>
+              <RecipeLink key={"menu" + recipe.id} {...recipe} />
+            )}
           </div>
           <div className="prep-recipes">
             <h1 style={h1Style}>Prep Recipes</h1>
-            {prepRecipes.map(recipe => <RecipeLink {...recipe} />)}
+            {prepRecipes.map(recipe =>
+              <RecipeLink key={"prep" + recipe.id} {...recipe} />
+            )}
           </div>
         </div>
       );
@@ -57,9 +62,10 @@ class RecipesList extends Component {
 }
 
 RecipesList.propTypes = {
-  recipes: PropTypes.array.isRequired,
-  onLoad: PropTypes.func,
-  onChange: PropTypes.func,
+  menuRecipes: PropTypes.array.isRequired,
+  prepRecipes: PropTypes.array.isRequired,
+  onLoad: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
   loaded: PropTypes.bool
 };
 

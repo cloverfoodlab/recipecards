@@ -1,6 +1,10 @@
 const fetch = require("node-fetch");
 const queryString = require("query-string");
 
+/*
+ * FETCH FROM PEACHWORKS API AND RETURN JSON RESULTS
+ */
+
 // for every URL path that starts with /api/, send request to upstream API service
 const peachworksApiUrl = (url, otherQueries = {}, page = 1, limit = 1000) => {
   const peachworksAccountId = process.env.PEACHWORKS_ACCOUNT_ID;
@@ -71,9 +75,9 @@ const proxyGetInventory = id => {
   return fetchAndRespond(apiUrl);
 };
 
-//wtm_inv_prep_recipe_items?access_token=<token>~&find={"inv_item_id":<id>}
+//wtm_inv_prep_recipe_items?access_token=<token>~&find={"inv_prep_recipe_id":<id>}
 const proxyGetPrepInventory = id => {
-  const otherQueries = { find: '{"inv_item_id":' + id + "}" };
+  const otherQueries = { find: '{"inv_prep_recipe_id":' + id + "}" };
   const apiUrl = peachworksApiUrl("wtm_inv_prep_recipe_items", otherQueries);
   return fetchAndRespond(apiUrl);
 };
@@ -112,12 +116,12 @@ const proxyGetCustomUnits = ids => {
 };
 
 module.exports = {
-  proxyGetMenuRecipes: proxyGetMenuRecipes,
-  proxyGetPrepRecipes: proxyGetPrepRecipes,
-  proxyGetInventory: proxyGetInventory,
-  proxyGetPrepInventory: proxyGetPrepInventory,
-  proxyGetInstructions: proxyGetInstructions,
-  proxyGetItems: proxyGetItems,
-  proxyGetUnits: proxyGetUnits,
-  proxyGetCustomUnits: proxyGetCustomUnits
+  proxyGetMenuRecipes,
+  proxyGetPrepRecipes,
+  proxyGetInventory,
+  proxyGetPrepInventory,
+  proxyGetInstructions,
+  proxyGetItems,
+  proxyGetUnits,
+  proxyGetCustomUnits
 };

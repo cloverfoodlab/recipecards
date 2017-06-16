@@ -73,10 +73,16 @@ const mapStateToProps = state => {
   const filter = state.filter.toLowerCase();
   return {
     prepRecipes: state.recipeList.filter(
-      r => !r.isMenuRecipe && r.name.toLowerCase().match(filter)
+      r =>
+        !r.isMenuRecipe &&
+        typeof r.name !== "undefined" &&
+        r.name.toLowerCase().match(filter)
     ),
     menuRecipes: state.recipeList.filter(
-      r => r.isMenuRecipe && r.name.toLowerCase().match(filter)
+      r =>
+        r.isMenuRecipe &&
+        typeof r.name !== "undefined" &&
+        r.name.toLowerCase().match(filter)
     ),
     loaded: state.loaded
   };

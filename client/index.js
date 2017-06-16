@@ -16,9 +16,11 @@ const client = axios.create({
   baseURL: "/api",
   responseType: "json"
 });
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 let store = createStore(
   recipes,
-  applyMiddleware(axiosMiddleware(client), thunk)
+  composeEnhancers(applyMiddleware(axiosMiddleware(client), thunk))
 );
 
 render(

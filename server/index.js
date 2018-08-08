@@ -2,28 +2,21 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const webpack = require("webpack");
-const webpackDevMiddleware = require("webpack-dev-middleware");
-const webpackHotMiddleware = require("webpack-hot-middleware");
-const config = require("../webpack.config.dev");
 const peachworks = require("./peachworks");
 const dbController = require("./dbController");
 const cron = require("./cron");
 
+const isDebug = process.env.NODE_ENV !== "production";
+
+const config = isDebug
+  ? require("../webpack.config.dev")
+  : require("../webpack.config.prod");
+const webpackDevMiddleware = isDebug ? require("webpack-dev-middleware") : null;
+const webpackHotMiddleware = isDebug ? require("webpack-hot-middleware") : null;
+
 cron.scheduleJobs();
 
-app.get("/api/recipes", (req, res) => {
-  dbController.getRecipes(req, res);
-});
-
-app.get("/api/menu_recipe/:id", (req, res) => {
-  dbController.getRecipe(req, res, true);
-});
-
-app.get("/api/prep_recipe/:id", (req, res) => {
-  dbController.getRecipe(req, res, false);
-});
-
-if (process.env.NODE_ENV !== "production") {
+if (isDebug) {
   app.use("/dist", express.static("static"));
 
   const compiler = webpack(config);
@@ -39,6 +32,18 @@ if (process.env.NODE_ENV !== "production") {
 } else {
   app.use("/dist", express.static("dist"));
 }
+
+app.get("/api/recipes", (req, res) => {
+  dbController.getRecipes(req, res);
+});
+
+app.get("/api/menu_recipe/:id", (req, res) => {
+  dbController.getRecipe(req, res, true);
+});
+
+app.get("/api/prep_recipe/:id", (req, res) => {
+  dbController.getRecipe(req, res, false);
+});
 
 app.get("/", (req, res) => {
   let indexPath = path.resolve(__dirname, "../index.html");

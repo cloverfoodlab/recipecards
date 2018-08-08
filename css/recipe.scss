@@ -5,6 +5,15 @@
   }
 }
 
+/* TODO: why doesn't this work? even with !important... and why is there a dot in front of things in print? */
+ol {
+  list-style: decimal !important;
+}
+
+ul {
+  list-style: circle !important;
+}
+
 .instruction {
   /* removing terrible things from peachworks*/
   .Apple-tab-span {
@@ -16,17 +25,49 @@
     display: none;
   }
 
-  /* TODO: why doesn't this work? even with !important... and why is there a dot in front of things in print? */
-  ol {
-    list-style-type: decimal;
-  }
-
-  ul {
-    list-style-type: circle;
-  }
-
   li {
-    margin: 8px 0;
+    margin: 8px 32px;
+  }
+}
+
+
+.ingredients-table {
+  border: 1px solid #ccc;
+
+  tr {
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
   }
 
+  th, td {
+    padding: 6px 12px;
+    border-right: 1px solid #ccc;
+  }
+
+  tr:nth-child(odd) {
+    background: #efefef;
+  }
+
+  th {
+    background: #333;
+    color: #fff;
+  }
+
+  td:first-child {
+    text-align: right;
+  }
+
+  tr:hover, tr:active, tr:focus {
+    background: #ffffcc;
+  }
+}
+
+
+.back-link {
+  float: right;
+  color: #333;
+
+  &:hover {
+    color: #0000ff;
+  }
 }

@@ -42,7 +42,7 @@ class Recipe extends Component {
     };
 
     const ingStyle = {
-      margin: "10px 0"
+      margin: "24px 0"
     };
 
     const h1Style = {
@@ -55,13 +55,33 @@ class Recipe extends Component {
       //TODO: is there a better way that doesn't involve duplicating the whole thing?
       return (
         <div style={recStyle} className="recipe">
-          <h1 style={h1Style}>Name: {name}</h1>
-          <div>{description ? "Yield: " + description : ""}</div>
+          <div className="recipe-header">
+            <a href="/" className="back-link">
+              Back To Recipe List
+            </a>
+
+            <h1 style={h1Style}>Name: {name}</h1>
+            <div>{description ? "Yield: " + description : ""}</div>
+          </div>
+
           <div className="ingredients" style={ingStyle}>
             <h1 style={h1Style}>Ingredients:</h1>
-            {inventory &&
-              inventory.map(i => <Ingredient key={i.position} {...i} />)}
+            <table className="ingredients-table">
+              <thead>
+                <tr>
+                  <th>Quantity</th>
+                  <th>Unit</th>
+                  <th>Ingredient</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {inventory &&
+                  inventory.map(i => <Ingredient key={i.position} {...i} />)}
+              </tbody>
+            </table>
           </div>
+
           <div className="instructions">
             <h1 style={h1Style}>Method of Prep:</h1>
             {instructions &&

@@ -3,11 +3,15 @@
 
 Nice recipe card interface for Peachworks recipe data.
 
+During development:
+
 ```
-npm run build
+npm run start
 ```
 
-As a starting point.
+As a starting point for a nice auto-rebuild flow.
+
+(Assumes you have properly set set `PEACHWORKS_ACCOUNT_ID` and `PEACHWORKS_ACCESS_TOKEN` env vars)
 
 You will need an env var defined for:
 

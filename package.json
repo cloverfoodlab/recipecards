@@ -22,7 +22,10 @@
     ]
   },
   "now": {
-    "alias": ["recipes", "clover.recipes"],
+    "alias": [
+      "recipes",
+      "clover.recipes"
+    ],
     "engines": {
       "node": "^8.0.0"
     },

@@ -5,8 +5,8 @@
   "main": "server/index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "build:webpack": "NODE_ENV=production webpack --config webpack.config.prod.js",
-    "build": "npm run clean && npm run build:webpack",
+    "build:webpack": "NODE_ENV=production webpack -p --config webpack.config.prod.js",
+    "build": "NODE_ENV=production npm run clean && npm run build:webpack",
     "eslint-check": "eslint --print-config .eslintrc | eslint-config-prettier-check",
     "lint": "eslint client server",
     "precommit": "lint-staged",
@@ -74,6 +74,7 @@
     "node-fetch": "^1.7.1",
     "node-sass": "^4.5.3",
     "node-schedule": "^1.2.3",
+    "now": "^11.3.8",
     "pouchdb": "^6.2.0",
     "pouchdb-adapter-memory": "^6.2.0",
     "pouchdb-upsert": "^2.2.0",

@@ -30,7 +30,12 @@ const Ingredient = ({
 
   const wholeUnit = (customUnit ? customUnit : unit).toLowerCase();
   return (
-    <tr className="ingredient" style={style}>
+    <tr
+      className="ingredient"
+      style={style}
+      data-item-id={itemId}
+      data-recipe-id={prepRecipeId}
+    >
       <td style={unitStyle}>{quantity}</td>
       <td style={unitStyle}>{wholeUnit}</td>
       <td style={nameStyle}>{nameLink}</td>

@@ -5,6 +5,9 @@ const db = require("./db");
  * FETCH DATA INTO DB FROM PEACHWORKS
  */
 
+// @TODO: incorporate inventory item allergens
+// wtm_inv_item_nutrition
+
 const noop = () => {};
 
 //pulls recipes data into db from peachworks

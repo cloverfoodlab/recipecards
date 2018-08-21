@@ -45,6 +45,25 @@ app.get("/api/prep_recipe/:id", (req, res) => {
   dbController.getRecipe(req, res, false);
 });
 
+app.get("/api/item_nutrition/:id", (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    throw new Error("invalid id");
+  }
+
+  peachworks
+    .proxyGetItemNutrition(id)
+    .then(json => {
+      res.json(json);
+    })
+    .catch(err => {
+      if (err.status !== 404) {
+        throw err;
+      }
+      console.log("error loading nutrition.");
+    });
+});
+
 app.get("/", (req, res) => {
   let indexPath = path.resolve(__dirname, "../index.html");
   res.sendFile(indexPath);

@@ -98,6 +98,12 @@ const proxyGetItems = ids => {
   return fetchAndRespond(apiUrl);
 };
 
+const proxyGetItemNutrition = id => {
+  const otherQueries = { find: '{"id":{"$in":[' + id + "]}}" };
+  const apiUrl = peachworksApiUrl("wtm_inv_item_nutrition", otherQueries);
+  return fetchAndRespond(apiUrl);
+};
+
 // fetch units of measures data
 // /wtm_units?access_token=<token>&find={"id":{"$in":[<ids>]}}
 const proxyGetUnits = ids => {
@@ -122,6 +128,7 @@ module.exports = {
   proxyGetPrepInventory,
   proxyGetInstructions,
   proxyGetItems,
+  proxyGetItemNutrition,
   proxyGetUnits,
   proxyGetCustomUnits
 };
